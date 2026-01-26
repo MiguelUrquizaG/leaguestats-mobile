@@ -68,11 +68,74 @@ class LoginPageView extends StatelessWidget {
               ),
             ),
             Center(
-              child: Container(
+              child: SizedBox(
                 width: 500,
                 height: 400,
-                color: Colors.red,
-                child: Column(),
+              
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Email',
+                          hintStyle: TextStyle(color: Colors.white),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          filled: true,
+                          fillColor: const Color.fromARGB(123, 158, 158, 158),
+                          labelText: 'Correo Electrónico',
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      SizedBox(height: 50),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Introduzca su contraseña',
+                          hintStyle: TextStyle(color: Colors.white),
+                          
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          labelText: 'Contraseña',
+                          filled: true,
+                          fillColor: const Color.fromARGB(123, 158, 158, 158),
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      
+                      ClipRRect(  
+                        borderRadius: BorderRadiusGeometry.circular(6),
+                        child: Container(
+                          width: 400,
+                          height: 70,
+                          color: const Color.fromRGBO(139, 0, 255, 1),
+                          child: TextButton(
+                            onPressed: null,
+                            child: Text(
+                              'Iniciar Sesión',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
