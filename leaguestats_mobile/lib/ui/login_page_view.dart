@@ -21,12 +21,30 @@ class LoginPageView extends StatelessWidget {
           children: [
             // Imagen de fondo
             Positioned(
-              child: Image(
-                image: NetworkImage(
-                  'https://www.mobachampion.com/imgs/blog/best-lee-sin-skins/Lee_Sin_NightbringerSkin.jpg',
-                ),
+              child: Stack(
+                children: [
+                  Image(
+                    image: NetworkImage(
+                      'https://www.mobachampion.com/imgs/blog/best-lee-sin-skins/Lee_Sin_NightbringerSkin.jpg',
+                    ),
+                  ),
+                  Positioned(
+                    left: 140,
+                    top: 70,
+                    child: Image(
+                      image: AssetImage('assets/images/logo.png'),
+                      width: 150,
+                    ),
+                  ),
+                ],
               ),
+              // child: Image(
+              //   image: NetworkImage(
+              //     'https://www.mobachampion.com/imgs/blog/best-lee-sin-skins/Lee_Sin_NightbringerSkin.jpg',
+              //   ),
+              // ),
             ),
+
             Positioned(
               child: Container(
                 decoration: BoxDecoration(
@@ -36,6 +54,16 @@ class LoginPageView extends StatelessWidget {
                     colors: [
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+                      const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
+
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
@@ -67,16 +95,18 @@ class LoginPageView extends StatelessWidget {
                 ),
               ),
             ),
+
             Center(
               child: SizedBox(
                 width: 500,
-                height: 400,
-              
+                height: double.infinity,
+
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 50),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Spacer(),
                       TextField(
                         decoration: InputDecoration(
                           hintText: 'Email',
@@ -99,7 +129,7 @@ class LoginPageView extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: 'Introduzca su contraseña',
                           hintStyle: TextStyle(color: Colors.white),
-                          
+
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white),
                           ),
@@ -113,21 +143,24 @@ class LoginPageView extends StatelessWidget {
                         ),
                         style: TextStyle(color: Colors.black),
                       ),
-                      
-                      ClipRRect(  
-                        borderRadius: BorderRadiusGeometry.circular(6),
-                        child: Container(
-                          width: 400,
-                          height: 70,
-                          color: const Color.fromRGBO(139, 0, 255, 1),
-                          child: TextButton(
-                            onPressed: null,
-                            child: Text(
-                              'Iniciar Sesión',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                      Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 40),
+                        child: ClipRRect(
+                          borderRadius: BorderRadiusGeometry.circular(6),
+                          child: Container(
+                            width: 400,
+                            height: 70,
+                            color: const Color.fromRGBO(139, 0, 255, 1),
+                            child: TextButton(
+                              onPressed: null,
+                              child: Text(
+                                'Iniciar Sesión',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),
