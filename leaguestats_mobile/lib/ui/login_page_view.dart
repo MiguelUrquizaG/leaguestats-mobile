@@ -87,7 +87,7 @@ class LoginPageView extends StatelessWidget {
                       const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0),
                       const Color.fromARGB(255, 0, 0, 0),
                       const Color.fromARGB(255, 0, 0, 0),
-                      const Color.fromARGB(255, 0, 0, 0), // Color inicial
+                       // Color inicial
                       // ignore: deprecated_member_use
                       // Se desvanece hacia la imagen
                     ],
