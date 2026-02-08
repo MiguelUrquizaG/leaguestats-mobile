@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/widget/champ_card_widget.dart';
 import 'package:leaguestats_mobile/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/widget/profile_icon_widget.dart';
+import 'package:leaguestats_mobile/widget/team_card_widget.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -22,7 +23,7 @@ class _HomePageViewState extends State<HomePageView> {
         decoration: BoxDecoration(color: Colors.black),
         child: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10),
-          child: Column(
+          child: ListView(
             children: [
               Row(
                 children: [
@@ -125,28 +126,73 @@ class _HomePageViewState extends State<HomePageView> {
                     ChampCardWidget(
                       url:
                           'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                          nombre: 'Ezreal',
-                          apodo: 'Aventurero de Piltover',
+                      nombre: 'Ezreal',
+                      apodo: 'Aventurero de Piltover',
                     ),
                     ChampCardWidget(
                       url:
                           'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                          nombre: 'Ezreal',
-                          apodo: 'Aventurero de Piltover',
+                      nombre: 'Ezreal',
+                      apodo: 'Aventurero de Piltover',
                     ),
                     ChampCardWidget(
                       url:
                           'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                          nombre: 'Ezreal',
-                          apodo: 'Aventurero de Piltover',
+                      nombre: 'Ezreal',
+                      apodo: 'Aventurero de Piltover',
                     ),
                     ChampCardWidget(
                       url:
                           'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                          nombre: 'Ezreal',
-                          apodo: 'Aventurero de Piltover',
+                      nombre: 'Ezreal',
+                      apodo: 'Aventurero de Piltover',
                     ),
-                    
+                  ],
+                ),
+              ),
+
+              Row(
+                children: [
+                  Text(
+                    'Equipos',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Spacer(),
+                  TextButton(
+                    onPressed: null,
+                    child: Text(
+                      'Ver todo',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: double.infinity,
+                height: 160,
+                child: ListView(
+                  padding: EdgeInsets.only(left: 1),
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    TeamCardWidget(
+                      url:
+                          "https://images.squarespace-cdn.com/content/v1/62d09f54a49d6f1c78455cce/16a13d58-e5ad-4a2d-b39f-ee9b97ade76f/T1+red.png?format=1500w",
+                      teamName: "T1",
+                    ),
+                    TeamCardWidget(
+                      url:
+                          "https://am-a.akamaihd.net/image?resize=400:&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1734012609283_MKOI_FullColor_Blue.png",
+                      teamName: "MKOI",
+                    ),
+                    TeamCardWidget(
+                      url:
+                          "https://g2esports.com/cdn/shop/files/G2-Esports-2020-Logo_87bf0678-e67f-4834-8b09-e56137ffaa80.png?v=1641913940",
+                      teamName: "G2",
+                    ),
                   ],
                 ),
               ),
