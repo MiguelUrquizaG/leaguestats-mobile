@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/widget/champ_card_widget.dart';
+import 'package:leaguestats_mobile/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/widget/profile_icon_widget.dart';
 import 'package:leaguestats_mobile/widget/team_card_widget.dart';
@@ -175,7 +176,6 @@ class _HomePageViewState extends State<HomePageView> {
                 width: double.infinity,
                 height: 160,
                 child: ListView(
-                  padding: EdgeInsets.only(left: 1),
                   scrollDirection: Axis.horizontal,
                   children: [
                     TeamCardWidget(
@@ -196,9 +196,83 @@ class _HomePageViewState extends State<HomePageView> {
                   ],
                 ),
               ),
+              Row(
+                children: [
+                  Text(
+                    'Partidas destacadas',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Spacer(),
+                  TextButton(
+                    onPressed: null,
+                    child: Text(
+                      'Ver todo',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: double.infinity,
+                height: 200,
+                child: ListView(
+                  padding: EdgeInsets.only(bottom: 10),
+                  children: [
+                    MatchCardWidget(
+                      iconoLiga:
+                          'https://liquipedia.net/commons/images/8/8f/LCK_2021_full_lightmode.png',
+                      nombreEquipo1: 'T1',
+                      nombreEquipo2: 'Gen.G',
+                      paisLiga: 'Corea',
+                      urlBandera:
+                          'https://sipalkido.com.ar/wp-content/uploads/2025/08/depositphotos_1919144-stock-photo-flag-of-south-korea.jpg',
+                    ),
+                    MatchCardWidget(
+                      iconoLiga:
+                          'https://liquipedia.net/commons/images/8/8f/LCK_2021_full_lightmode.png',
+                      nombreEquipo1: 'T1',
+                      nombreEquipo2: 'Gen.G',
+                      paisLiga: 'Corea',
+                      urlBandera:
+                          'https://sipalkido.com.ar/wp-content/uploads/2025/08/depositphotos_1919144-stock-photo-flag-of-south-korea.jpg',
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: 0,
+        backgroundColor: const Color.fromARGB(255, 36, 36, 36),
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.white,
+        onTap: (index) {},
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_filled),
+            label: 'Inicio',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.newspaper),
+            label: 'Noticias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Apuestas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.data_usage),
+            label: 'Estadisticas',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+        ],
       ),
     );
   }
