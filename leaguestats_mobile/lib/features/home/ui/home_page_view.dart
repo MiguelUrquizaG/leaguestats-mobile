@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:leaguestats_mobile/widget/champ_card_widget.dart';
-import 'package:leaguestats_mobile/widget/match_card_widget.dart';
-import 'package:leaguestats_mobile/widget/news_card_widget.dart';
-import 'package:leaguestats_mobile/widget/profile_icon_widget.dart';
-import 'package:leaguestats_mobile/widget/team_card_widget.dart';
+import 'package:leaguestats_mobile/features/home/widget/champ_card_widget.dart';
+import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
+import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
+import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
+import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
