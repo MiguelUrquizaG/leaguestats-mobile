@@ -1,30 +1,48 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:leaguestats_mobile/main.dart';
+import 'package:leaguestats_mobile/features/champion_detail/ui/champion_detail_view.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Champion Detail View renders correctly', (WidgetTester tester) async {
+    // Increase surface size to avoid off-screen issues
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Build our widget and trigger a frame.
+    // We use a custom error handler to ignore image network errors during test
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails details) {
+      if (details.silent) return;
+      if (details.exception.toString().contains('NetworkImageLoadException') ||
+          details.exception.toString().contains('HTTP request failed')) {
+        return;
+      }
+      originalOnError?.call(details);
+    };
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpWidget(const MaterialApp(home: ChampionDetailView()));
+
+    // Verify that champion name is present
+    expect(find.text('EZREAL'), findsAtLeastNWidgets(1));
+
+    // Verify skill detail card initially shows Q
+    expect(find.text('DISPARO MÍSTICO'), findsOneWidget);
+
+    // Tap on another skill (the first one, Passive)
+    // Skill icons are the Image widgets.
+    final skillIcons = find.byType(Image);
+    expect(skillIcons, findsNWidgets(5));
+
+    await tester.ensureVisible(skillIcons.at(0));
+    await tester.tap(skillIcons.at(0));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify description changed (Pasiva description)
+    // Now "PASIVA" should appear twice (title and key)
+    expect(find.text('PASIVA'), findsNWidgets(2));
+    expect(find.textContaining('Ezreal gana velocidad de ataque'), findsOneWidget);
+
+    // Restore error handler
+    FlutterError.onError = originalOnError;
   });
 }
