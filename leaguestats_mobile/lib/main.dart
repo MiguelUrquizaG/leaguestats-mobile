@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/home/ui/home_page_view.dart';
+import 'package:leaguestats_mobile/features/home/ui/prueba.dart';
 import 'package:leaguestats_mobile/features/login/ui/login_page_view.dart';
 
 void main() {
