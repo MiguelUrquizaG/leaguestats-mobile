@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/home/widget/champ_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
+import 'package:leaguestats_mobile/features/news/news.dart';
 import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
 
@@ -66,8 +67,14 @@ class _HomePageViewState extends State<HomePageView> {
                   ),
                   Spacer(),
                   TextButton(
-                    onPressed: null,
-                    child: Text(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const NewsSearchPageView(),
+                        ),
+                      );
+                    },
+                    child: const Text(
                       'Ver todo',
                       style: TextStyle(color: Colors.grey),
                     ),
@@ -253,7 +260,15 @@ class _HomePageViewState extends State<HomePageView> {
         backgroundColor: const Color.fromARGB(255, 36, 36, 36),
         selectedItemColor: Colors.blueAccent,
         unselectedItemColor: Colors.white,
-        onTap: (index) {},
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const NewsSearchPageView(),
+              ),
+            );
+          }
+        },
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_filled),
