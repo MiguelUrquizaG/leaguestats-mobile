@@ -12,6 +12,9 @@ void main() {
       ),
     );
 
+    // Handle NetworkImage exceptions in tests
+    tester.takeException();
+
     // Verify that the logo text is present
     expect(
       find.byWidgetPredicate((widget) =>
