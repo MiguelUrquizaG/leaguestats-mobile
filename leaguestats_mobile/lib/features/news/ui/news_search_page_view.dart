@@ -10,12 +10,14 @@ class NewsSearchPageView extends StatefulWidget {
 
 class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   String _selectedCategory = 'Competitivo';
-  final TextEditingController _searchController = TextEditingController(text: 'E');
+  final TextEditingController _searchController = TextEditingController(
+    text: 'E',
+  );
   final List<String> _categories = [
     'Competitivo',
     'Transfer',
     'Tutoriales',
-    'Skins'
+    'Skins',
   ];
 
   @override
@@ -33,7 +35,10 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
           children: [
             // Header Section
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4.0,
+                vertical: 8.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -71,7 +76,10 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                   cursorColor: const Color(0xFF7C3AED),
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search, color: Color(0xFF8E8A93)),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Color(0xFF8E8A93),
+                    ),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.cancel, color: Color(0xFF8E8A93)),
                       onPressed: () => _searchController.clear(),
@@ -119,7 +127,9 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                         child: Text(
                           category,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : const Color(0xFF8E8A93),
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF8E8A93),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -137,7 +147,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 children: const [
                   NewsDetailCard(
                     imageUrl:
-                        'https://lh3.googleusercontent.com/aida-public/AB6AXuAIT3CFcWy4EkTxBWZJsaOcNB561Nlbaa-DDoLmSQbmbqB9ZHMRo6ZKQ4CLKHwwDcMSortL4SvX4N3bx6uVTHfhSCK-dPa0bQZFVuEXVyN5SPI-w_SGUdZYCRdqClx2L0edYlpZpNSFpGvFIpmWeA1Qs7Q3UFxZSwjE6Xiha3Y5tCsl11CSbLzHEid463H6DGzSAMU-_FlKvSjMkyrNoKzLM0wN_Q12RVxwF0P6nE-2w3awsnFOSmrB82ZAonJRoePU1TTbZKJfvbY',
+                        'https://cdn.sanity.io/images/dsfx7636/news/92a7400ec9ba59e10fc7241fc933ffc5829eeb2e-1600x900.jpg',
                     category: 'LEC',
                     time: 'Hace 2 horas',
                     title: 'MKOI arrasa',
