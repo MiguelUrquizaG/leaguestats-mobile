@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leaguestats_mobile/features/news/news.dart';
 
 class NewsCardWidget extends StatelessWidget {
   const NewsCardWidget({
@@ -53,8 +54,15 @@ class NewsCardWidget extends StatelessWidget {
                       color: const Color.fromARGB(255, 34, 34, 34),
                     ),
                     child: IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.arrow_forward, color: Colors.white),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NewsDetailPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward, color: Colors.white),
                     ),
                   ),
                 ],
