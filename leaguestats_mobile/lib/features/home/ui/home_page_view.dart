@@ -4,6 +4,7 @@ import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
+import 'package:leaguestats_mobile/features/profile/profile.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -28,7 +29,17 @@ class _HomePageViewState extends State<HomePageView> {
             children: [
               Row(
                 children: [
-                  ProfileIconWidget(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfilePageView(),
+                        ),
+                      );
+                    },
+                    child: ProfileIconWidget(),
+                  ),
                   SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
