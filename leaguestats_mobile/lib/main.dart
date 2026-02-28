@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/home/ui/home_page_view.dart';
+import 'package:leaguestats_mobile/features/login/ui/login_page_view.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
+import 'package:leaguestats_mobile/features/register/ui/register_page_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const NewsDetailPage(),
+      home: const LoginPageView(),
     );
   }
 }
