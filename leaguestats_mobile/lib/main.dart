@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/login/ui/login_page_view.dart';
+import 'package:leaguestats_mobile/features/register/register_real_page_view.dart';
+import 'package:leaguestats_mobile/features/register/ui/register_page_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPageView(),
+      home: const RegisterRealPageView(),
     );
   }
 }
