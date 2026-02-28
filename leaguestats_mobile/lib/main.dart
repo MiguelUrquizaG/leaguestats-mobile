@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:leaguestats_mobile/features/login/ui/login_page_view.dart';
+import 'package:leaguestats_mobile/features/register/register_real_page_view.dart';
+import 'package:leaguestats_mobile/features/register/ui/register_page_view.dart';
 import 'package:leaguestats_mobile/features/register/ui/register_real_page_view.dart';
 import 'features/login/ui/login_page_view.dart';
 import 'features/register/ui/register_page_view.dart';
