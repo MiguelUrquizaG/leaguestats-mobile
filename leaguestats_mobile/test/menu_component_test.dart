@@ -11,6 +11,7 @@ void main() {
         ),
       ),
     );
+    tester.takeException();
 
     // Handle NetworkImage exceptions in tests
     tester.takeException();
