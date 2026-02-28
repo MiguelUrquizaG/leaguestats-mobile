@@ -11,6 +11,7 @@ void main() {
         ),
       ),
     );
+    tester.takeException();
 
     // Verify that the logo text is present
     expect(
