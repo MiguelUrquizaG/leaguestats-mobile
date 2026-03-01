@@ -1,18 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:leaguestats_mobile/core/interfaces/league_interface.dart';
 import 'package:leaguestats_mobile/core/models/leagues/league_list_response_dto.dart';
 import 'package:http/http.dart' as http;
 
 class LeagueService implements LeagueInterface {
-  String get _apiUrl {
-    final host =
-        kIsWeb || defaultTargetPlatform != TargetPlatform.android
-        ? 'localhost'
-        : '10.0.2.2';
-    return 'http://$host:8000/api';
-  }
+  final String _apiUrl = "http://10.0.2.2:8000/api";
 
   @override
   Future<List<LeagueListResponseDto>> getAll() async {

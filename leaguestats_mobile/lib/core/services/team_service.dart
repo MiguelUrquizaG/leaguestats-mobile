@@ -1,18 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:leaguestats_mobile/core/interfaces/team_interface.dart';
 import 'package:leaguestats_mobile/core/models/teams/team_list_response_dto.dart';
 
 class TeamService implements TeamInterface {
-	String get _apiUrl {
-		final host =
-				kIsWeb || defaultTargetPlatform != TargetPlatform.android
-						? 'localhost'
-						: '10.0.2.2';
-		return 'http://$host:8000/api';
-	}
+	final String _apiUrl = "http://10.0.2.2:8000/api";
 
 	@override
 	Future<List<TeamListResponseDto>> getAll() async {
