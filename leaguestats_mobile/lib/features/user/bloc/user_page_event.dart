@@ -6,5 +6,5 @@ sealed class UserPageEvent {}
 final class UserProfileByEmailEvent implements UserPageEvent{
   final String? email;
 
-  UserProfileByEmailEvent({required this.email});
+  UserProfileByEmailEvent({ this.email});
 }
