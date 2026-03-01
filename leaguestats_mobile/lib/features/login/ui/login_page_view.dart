@@ -5,7 +5,7 @@ import 'package:leaguestats_mobile/features/login/bloc/login_page_bloc.dart';
 import '../../home/ui/home_page_view.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
-import '../../../core/models/login_request_dto.dart';
+import '../../../core/models/auth/login_request_dto.dart';
 
 class LoginPageView extends StatefulWidget {
   const LoginPageView({super.key});

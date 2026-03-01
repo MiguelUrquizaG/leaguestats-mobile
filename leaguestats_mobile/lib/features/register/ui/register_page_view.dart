@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:leaguestats_mobile/core/services/auth_service.dart';
+import 'package:leaguestats_mobile/core/services/storage_service.dart';
 import 'package:leaguestats_mobile/features/register/bloc/register_page_bloc.dart';
 
 class RegisterPageView extends StatefulWidget {
@@ -30,7 +32,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
     final primaryColor = const Color(0xFF8B00FF);
 
     return BlocProvider(
-      create: (_) => RegisterPageBloc(),
+      create: (_) => RegisterPageBloc(AuthService(), StorageService()),
       child: BlocListener<RegisterPageBloc, RegisterPageState>(
         listener: (context, state) {
           if (state is RegisterPageSuccess) {
