@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leaguestats_mobile/features/login/bloc/login_page_bloc.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import '../../home/ui/home_page_view.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';

@@ -11,23 +11,31 @@ class NewsService implements NewsInterface {
   final StorageService storage_service = StorageService();
   @override
   Future<List<NewsResponseDto>> getAll() async {
+    print('SERVICIO');
     var _token = await storage_service.getToken();
     var response = await http.get(
       Uri.parse('$_apiUrl/news'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',
+        'Accept': 'application/json',
       },
     );
 
+    print(response.body);
+    print(_token);
+
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        var newsList = NewsListResponse.fromJson(jsonDecode(response.body));
-        return newsList.results;
+        var newsList = NewsResponseDto.fromJsonList(jsonDecode(response.body));
+        print('CORRECTO');
+        return newsList;
       } else {
+        print('ERROR');
         throw Exception(response.body);
       }
     } catch (e) {
+      print('ERROR 2');
       throw Exception(e.toString());
     }
   }

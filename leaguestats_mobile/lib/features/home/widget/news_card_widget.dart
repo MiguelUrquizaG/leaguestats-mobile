@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:leaguestats_mobile/features/news/news.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 
 class NewsCardWidget extends StatelessWidget {
   const NewsCardWidget({

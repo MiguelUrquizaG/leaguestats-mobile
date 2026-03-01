@@ -40,4 +40,8 @@ class NewsResponseDto {
       'updated_at': updatedAt,
     };
   }
+
+  static List<NewsResponseDto> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((item) => NewsResponseDto.fromJson(item)).toList();
+  }
 }

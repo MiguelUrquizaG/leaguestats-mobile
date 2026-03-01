@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/login/ui/login_page_view.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import 'package:leaguestats_mobile/features/register/ui/register_real_page_view.dart';
 import 'package:leaguestats_mobile/features/register/ui/register_page_view.dart';
 import 'package:leaguestats_mobile/features/register/ui/register_real_page_view.dart';
@@ -27,8 +29,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPageView(),
         '/home': (context) => const HomePageView(),
         '/register_real': (context) => const RegisterRealPageView(),
+        '/news': (context) => const NewsSearchPageView(),
       },
     );
   }
 }
-

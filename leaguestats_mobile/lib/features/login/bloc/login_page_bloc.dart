@@ -17,6 +17,7 @@ class LoginPageBloc extends Bloc<LoginPageEvent, LoginPageState> {
       try {
         var login_response = await auth_service.login(event.dto);
         await storage_service.saveToken(login_response.token.toString());
+        await storage_service.saveEmail(event.dto.email.toString());
         emit(LoginPageSuccess(dto: login_response));
       } catch (e) {
         emit(LoginPageError(message: e.toString()));

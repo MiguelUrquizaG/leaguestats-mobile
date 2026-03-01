@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaguestats_mobile/features/news/news.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 
 void main() {
   testWidgets('NewsDetailPage renders correctly', (WidgetTester tester) async {
