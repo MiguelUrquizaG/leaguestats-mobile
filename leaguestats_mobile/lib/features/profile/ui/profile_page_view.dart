@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:leaguestats_mobile/core/models/user/user_response_dto.dart';
+import 'package:leaguestats_mobile/core/services/user_service.dart';
 import '../widget/profile_stat_widget.dart';
 import '../widget/profile_info_item.dart';
 
-class ProfilePageView extends StatelessWidget {
+class ProfilePageView extends StatefulWidget {
   const ProfilePageView({super.key});
+
+  @override
+  State<ProfilePageView> createState() => _ProfilePageViewState();
+}
+
+class _ProfilePageViewState extends State<ProfilePageView> {
+  late final Future<UserResponseDto> _userProfileFuture;
 
   static const Color kPrimaryColor = Color(0xFFA855F7);
   static const Color kBackgroundColor = Color(0xFF121214);
@@ -12,13 +21,57 @@ class ProfilePageView extends StatelessWidget {
   static const Color kTextSubColor = Color(0xFFA1A1AA);
 
   @override
+  void initState() {
+    super.initState();
+    _userProfileFuture = UserService().getCurrentUserProfile();
+  }
+
+  String _safe(String? value, {String fallback = 'N/A'}) {
+    final parsed = value?.trim();
+    if (parsed == null || parsed.isEmpty) {
+      return fallback;
+    }
+    return parsed;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
+        child: FutureBuilder<UserResponseDto>(
+          future: _userProfileFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Error cargando perfil',
+                    style: GoogleFonts.splineSans(color: Colors.white70),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+
+            final profile = snapshot.data;
+            final username =
+                _safe(profile?.username ?? profile?.user?.name, fallback: 'Usuario');
+            final email = _safe(profile?.user?.email, fallback: '@sin-email');
+            final role = _safe(profile?.user?.role, fallback: 'Sin rol');
+            final countryName = _safe(profile?.country?.name, fallback: 'Sin país');
+            final countryCode = _safe(profile?.country?.flag, fallback: '--');
+            final teamName = _safe(profile?.team?.name, fallback: 'Sin equipo');
+            final premiumLabel = (profile?.isPremium == 1) ? 'Premium' : 'Free Member';
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
               // Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -118,7 +171,7 @@ class ProfilePageView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Faker_Fan_99',
+                      username,
                       style: GoogleFonts.splineSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -126,7 +179,7 @@ class ProfilePageView extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '@faker_fan_99',
+                      email,
                       style: GoogleFonts.splineSans(
                         fontSize: 14,
                         color: kTextSubColor,
@@ -147,7 +200,7 @@ class ProfilePageView extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        'Pro Member',
+                        premiumLabel,
                         style: GoogleFonts.splineSans(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -167,11 +220,26 @@ class ProfilePageView extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const Expanded(child: ProfileStatWidget(value: '2.5k', label: 'Followers')),
+                    Expanded(
+                      child: ProfileStatWidget(
+                        value: (profile?.followers ?? 0).toString(),
+                        label: 'Followers',
+                      ),
+                    ),
                     Container(width: 1, height: 32, color: Colors.white.withOpacity(0.1)),
-                    const Expanded(child: ProfileStatWidget(value: '150', label: 'Following')),
+                    Expanded(
+                      child: ProfileStatWidget(
+                        value: (profile?.balance ?? 0).toString(),
+                        label: 'Balance',
+                      ),
+                    ),
                     Container(width: 1, height: 32, color: Colors.white.withOpacity(0.1)),
-                    const Expanded(child: ProfileStatWidget(value: '342', label: 'Matches')),
+                    Expanded(
+                      child: ProfileStatWidget(
+                        value: (profile?.ratedMatches ?? 0).toString(),
+                        label: 'Matches',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -239,32 +307,34 @@ class ProfilePageView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const ProfileInfoItem(
+                    ProfileInfoItem(
                       icon: Icons.emoji_events_outlined,
-                      title: 'Rank',
-                      value: 'Diamond I',
+                      title: 'Role',
+                      value: role,
                     ),
-                    const ProfileInfoItem(
+                    ProfileInfoItem(
                       icon: Icons.groups_outlined,
                       title: 'Favorite Team',
-                      value: 'T1 Esports',
+                      value: teamName,
                     ),
-                    const ProfileInfoItem(
+                    ProfileInfoItem(
                       icon: Icons.favorite_border,
-                      title: 'Favorite Champion',
-                      value: 'Ahri (Mid Lane)',
+                      title: 'Username',
+                      value: username,
                     ),
-                    const ProfileInfoItem(
+                    ProfileInfoItem(
                       icon: Icons.public,
                       title: 'Region',
-                      value: 'South Korea (LCK)',
+                      value: '$countryName ($countryCode)',
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 40),
-            ],
-          ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

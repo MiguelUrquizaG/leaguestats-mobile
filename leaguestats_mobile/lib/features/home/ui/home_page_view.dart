@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:leaguestats_mobile/features/home/widget/champ_card_widget.dart';
+import 'package:leaguestats_mobile/core/models/leagues/league_list_response_dto.dart';
+import 'package:leaguestats_mobile/core/models/teams/team_list_response_dto.dart';
+import 'package:leaguestats_mobile/core/models/user/user_response_dto.dart';
+import 'package:leaguestats_mobile/core/services/league_service.dart';
+import 'package:leaguestats_mobile/core/services/team_service.dart';
+import 'package:leaguestats_mobile/core/services/user_service.dart';
 import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
@@ -14,6 +19,27 @@ class HomePageView extends StatefulWidget {
 }
 
 class _HomePageViewState extends State<HomePageView> {
+  late final Future<List<TeamListResponseDto>> _teamsFuture;
+  late final Future<List<LeagueListResponseDto>> _leaguesFuture;
+  late final Future<UserResponseDto> _userProfileFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _teamsFuture = TeamService().getAll();
+    _leaguesFuture = LeagueService().getAll();
+    _userProfileFuture = UserService().getCurrentUserProfile();
+  }
+
+  String _flagUrlFromCode(String? code) {
+    final normalized = (code ?? '').trim().toLowerCase();
+    if (normalized.isEmpty) {
+      return 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
+    }
+
+    return 'https://flagcdn.com/w40/$normalized.png';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,42 +53,75 @@ class _HomePageViewState extends State<HomePageView> {
           padding: const EdgeInsets.only(left: 10, right: 10),
           child: ListView(
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfilePageView(),
-                        ),
-                      );
-                    },
-                    child: ProfileIconWidget(),
-                  ),
-                  SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              FutureBuilder<UserResponseDto>(
+                future: _userProfileFuture,
+                builder: (context, snapshot) {
+                  final profile = snapshot.data;
+                  final displayName =
+                      profile?.username ?? profile?.user?.name ?? 'Usuario';
+                  final countryName = profile?.country?.name ?? 'País';
+                  final countryFlagUrl = _flagUrlFromCode(profile?.country?.flag);
+
+                  return Row(
                     children: [
-                      Text(
-                        'NombreUsuario',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      Row(
-                        children: [
-                          Text('País', style: TextStyle(color: Colors.white)),
-                          SizedBox(width: 20),
-                          Image(
-                            image: NetworkImage(
-                              'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/1280px-Flag_of_South_Korea.svg.png',
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfilePageView(),
                             ),
-                            width: 25,
-                          ),
-                        ],
+                          );
+                        },
+                        child: const ProfileIconWidget(),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Flexible(
+                                  fit: FlexFit.loose,
+                                  child: Text(
+                                    countryName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Image.network(
+                                  countryFlagUrl,
+                                  width: 25,
+                                  height: 18,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.flag_outlined,
+                                      color: Colors.white54,
+                                      size: 20,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
-                  ),
-                ],
+                  );
+                },
               ),
               SizedBox(height: 15),
               Row(
@@ -111,7 +170,7 @@ class _HomePageViewState extends State<HomePageView> {
               Row(
                 children: [
                   Text(
-                    'Campeones',
+                    'Ligas',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -130,36 +189,50 @@ class _HomePageViewState extends State<HomePageView> {
               ),
               SizedBox(
                 width: double.infinity,
-                height: 200,
-                child: ListView(
-                  padding: const EdgeInsets.only(right: 10),
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    ChampCardWidget(
-                      url:
-                          'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                      nombre: 'Ezreal',
-                      apodo: 'Aventurero de Piltover',
-                    ),
-                    ChampCardWidget(
-                      url:
-                          'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                      nombre: 'Ezreal',
-                      apodo: 'Aventurero de Piltover',
-                    ),
-                    ChampCardWidget(
-                      url:
-                          'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                      nombre: 'Ezreal',
-                      apodo: 'Aventurero de Piltover',
-                    ),
-                    ChampCardWidget(
-                      url:
-                          'https://www.lolvvv.com/_next/image?url=https%3A%2F%2Fddragon.leagueoflegends.com%2Fcdn%2Fimg%2Fchampion%2Fsplash%2FEzreal_33.jpg&w=1200&q=75',
-                      nombre: 'Ezreal',
-                      apodo: 'Aventurero de Piltover',
-                    ),
-                  ],
+                height: 160,
+                child: FutureBuilder<List<LeagueListResponseDto>>(
+                  future: _leaguesFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(
+                          'Error cargando ligas',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      );
+                    }
+
+                    final leagues = snapshot.data ?? [];
+                    if (leagues.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No hay ligas disponibles',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: leagues.length,
+                      itemBuilder: (context, index) {
+                        final league = leagues[index];
+                        final logo =
+                            (league.logo != null && league.logo!.isNotEmpty)
+                            ? league.logo!
+                            : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
+
+                        return TeamCardWidget(
+                          url: logo,
+                          teamName: league.name ?? 'Sin nombre',
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
 
@@ -186,25 +259,48 @@ class _HomePageViewState extends State<HomePageView> {
               SizedBox(
                 width: double.infinity,
                 height: 160,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    TeamCardWidget(
-                      url:
-                          "https://images.squarespace-cdn.com/content/v1/62d09f54a49d6f1c78455cce/16a13d58-e5ad-4a2d-b39f-ee9b97ade76f/T1+red.png?format=1500w",
-                      teamName: "T1",
-                    ),
-                    TeamCardWidget(
-                      url:
-                          "https://am-a.akamaihd.net/image?resize=400:&f=http%3A%2F%2Fstatic.lolesports.com%2Fteams%2F1734012609283_MKOI_FullColor_Blue.png",
-                      teamName: "MKOI",
-                    ),
-                    TeamCardWidget(
-                      url:
-                          "https://g2esports.com/cdn/shop/files/G2-Esports-2020-Logo_87bf0678-e67f-4834-8b09-e56137ffaa80.png?v=1641913940",
-                      teamName: "G2",
-                    ),
-                  ],
+                child: FutureBuilder<List<TeamListResponseDto>>(
+                  future: _teamsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(
+                          'Error cargando equipos',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      );
+                    }
+
+                    final teams = snapshot.data ?? [];
+                    if (teams.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No hay equipos disponibles',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: teams.length,
+                      itemBuilder: (context, index) {
+                        final team = teams[index];
+                        final logo = (team.logo != null && team.logo!.isNotEmpty)
+                            ? team.logo!
+                            : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
+
+                        return TeamCardWidget(
+                          url: logo,
+                          teamName: team.name ?? 'Sin nombre',
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
               Row(
