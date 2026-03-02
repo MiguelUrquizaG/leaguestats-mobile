@@ -21,3 +21,5 @@ final class WithdrawBetEvent extends BetsPageEvent {
   WithdrawBetEvent({required this.betId});
 }
 
+final class LoadUserBetsHistoryEvent extends BetsPageEvent {}
+

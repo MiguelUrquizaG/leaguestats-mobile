@@ -7,6 +7,7 @@ import 'package:leaguestats_mobile/core/services/league_service.dart';
 import 'package:leaguestats_mobile/features/bets/bloc/bets_page_bloc.dart';
 import 'package:leaguestats_mobile/features/bets/ui/add_balance_page_view.dart';
 import 'package:leaguestats_mobile/features/bets/ui/betting_bottom_sheet_widget.dart';
+import 'package:leaguestats_mobile/features/bets/ui/history_page_view.dart';
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
 import 'package:leaguestats_mobile/features/register/bloc/league_bloc.dart';
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
@@ -422,7 +423,31 @@ class _BetsPageViewState extends State<BetsPageView> {
             ),
           ],
         ),
-        _buildSquareIcon(Icons.tune),
+        Row(
+          // Envolvemos en un Row para tener dos botones
+          children: [
+            // BOTÓN MIS APUESTAS
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider(
+                      create: (_) => BetsPageBloc(BetService()),
+                      child: const HistoryPageView(),
+                    ),
+                  ),
+                );
+              },
+              child: _buildSquareIcon(
+                Icons.history,
+                color: const Color(0xFF8B5CF6),
+              ),
+            ),
+            const SizedBox(width: 10),
+            _buildSquareIcon(Icons.tune),
+          ],
+        ),
       ],
     );
   }
@@ -617,7 +642,7 @@ class _BetsPageViewState extends State<BetsPageView> {
     );
   }
 
-  Widget _buildSquareIcon(IconData icon) {
+  Widget _buildSquareIcon(IconData icon, {Color? color}) {
     return Container(
       width: 40,
       height: 40,
@@ -626,7 +651,7 @@ class _BetsPageViewState extends State<BetsPageView> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFF2A2C35)),
       ),
-      child: Icon(icon, color: const Color(0xFF9CA3AF), size: 20),
+      child: Icon(icon, color: color ?? const Color(0xFF9CA3AF), size: 20),
     );
   }
 

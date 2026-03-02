@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:leaguestats_mobile/core/interfaces/bet_interface.dart';
 import 'package:leaguestats_mobile/core/models/bets/bet_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/bets/place_bet_request_dto.dart';
+import 'package:leaguestats_mobile/core/models/bets/user_bet_dto.dart';
 import 'package:leaguestats_mobile/core/services/storage_service.dart';
 import 'package:http/http.dart' as http;
 
@@ -34,9 +35,22 @@ class BetService implements BetInterface {
   }
 
   @override
-  Future<List<BetResponseDto>> getUserBets() async {
-    // TODO: implement getUserBets
-    throw UnimplementedError();
+  Future<List<BetResponseDto>> getUserBets(int id) async {
+    final token = await storageService.getToken();
+    final response = await http.get(
+      Uri.parse('$_apiBaseUrl/userBets/$id/bets'), // Ajusta a tu ruta real
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body); // Devuelve la lista de apuestas
+    } else {
+      throw Exception("Error al obtener historial: ${response.body}");
+    }
   }
 
   @override
@@ -114,6 +128,31 @@ class BetService implements BetInterface {
       }
     } catch (e) {
       throw Exception(e.toString());
+    }
+  }
+  // En bet_service.dart
+
+  Future<List<UserBetDto>> getUserBetsById(int userId) async {
+    final token = await storageService.getToken();
+    final url = '$_apiBaseUrl/userBets/$userId/bets';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Decodificamos el JSON (que es una lista)
+      final List<dynamic> data = jsonDecode(response.body);
+
+      // Convertimos cada elemento de la lista en un objeto UserBetDto
+      return data.map((json) => UserBetDto.fromJson(json)).toList();
+    } else {
+      throw Exception("Error al obtener apuestas: ${response.statusCode}");
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:leaguestats_mobile/core/models/bets/bet_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/bets/place_bet_request_dto.dart';
+import 'package:leaguestats_mobile/core/models/bets/user_bet_dto.dart';
 import 'package:leaguestats_mobile/core/services/bet_service.dart';
 import 'package:leaguestats_mobile/core/services/storage_service.dart';
 import 'package:leaguestats_mobile/core/services/user_service.dart';
@@ -70,6 +71,33 @@ class BetsPageBloc extends Bloc<BetsPageEvent, BetsPageState> {
       try {
         await betService.withdrawBet(event.betId);
         emit(WithdrawBetSuccess());
+      } catch (e) {
+        emit(BetsPageError(message: e.toString()));
+      }
+    });
+    on<LoadUserBetsHistoryEvent>((event, emit) async {
+      emit(BetsPageLoading());
+      try {
+        final storageService = StorageService();
+        final userService = UserService();
+
+        // 1. Buscamos el email
+        String? email = await storageService.getEmail();
+        if (email == null) throw Exception("No se encontró sesión activa");
+
+        // 2. Buscamos el perfil para obtener el ID real de Laravel
+        var userProfile = await userService.getUserProfileByEmail(email);
+        if (userProfile.id == null) {
+          throw Exception("No se pudo obtener el ID del usuario");
+        }
+
+        // 3. Llamamos al servicio (que ya devuelve List<UserBetDto>)
+        final List<UserBetDto> bets = await betService.getUserBetsById(
+          userProfile.id!,
+        );
+
+        // 4. Emitimos el éxito
+        emit(UserBetsHistorySuccess(bets: bets));
       } catch (e) {
         emit(BetsPageError(message: e.toString()));
       }
