@@ -46,7 +46,25 @@ class UserPageBloc extends Bloc<UserPageEvent, UserPageState> {
         emit(UserPageError(message: e.toString()));
       }
     });
-    
-  }
 
+    // En el constructor del UserPageBloc
+    on<UserAddBalanceEvent>((event, emit) async {
+      emit(UserPageLoading());
+      try {
+        // 1. Llamamos al backend para añadir el dinero
+        await _userService.addBalance(event.amount);
+
+        // 2. Volvemos a pedir el perfil actualizado
+        String? email = await _storageService.getEmail();
+        var updatedProfile = await _userService.getUserProfileByEmail(email!);
+
+        // 3. Emitimos tu estado de éxito general.
+        // Esto hará que toda la app reaccione y actualice el número del saldo.
+        emit(UserPageSuccess(dto: updatedProfile));
+      } catch (e) {
+        // Usamos el error específico que creaste
+        emit(UserAddBalanceError(message: e.toString()));
+      }
+    });
+  }
 }

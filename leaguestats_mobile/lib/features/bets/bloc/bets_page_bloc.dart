@@ -48,15 +48,20 @@ class BetsPageBloc extends Bloc<BetsPageEvent, BetsPageState> {
         emit(BetsPageError(message: e.toString()));
       }
     });
+    // BUSCA ESTE BLOQUE Y ACTUALÍZALO
     on<LoadPreviousBetEvent>((event, emit) async {
       emit(BetsPageLoading());
       try {
-        // Llamamos al servicio limpio
-        int amount = await betService.checkAlreadyBetAmount(event.betId);
-        emit(PreviousBetSuccess(amount: amount));
+        var data = await betService.checkAlreadyBetAmount(event.betId);
+
+        emit(
+          PreviousBetSuccess(
+            amount: data['amount'],
+            winnerSelected: data['winner_selected'], // <-- LE PASAMOS EL ID
+          ),
+        );
       } catch (e) {
-        // Si hay error (ej. red), asumimos 0 para no bloquear la UI
-        emit(PreviousBetSuccess(amount: 0));
+        emit(PreviousBetSuccess(amount: 0, winnerSelected: null));
       }
     });
 

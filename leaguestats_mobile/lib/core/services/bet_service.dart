@@ -65,7 +65,7 @@ class BetService implements BetInterface {
   }
 
   @override
-  Future<int> checkAlreadyBetAmount(int betId) async {
+  Future<Map<String, dynamic>> checkAlreadyBetAmount(int betId) async {
     var token = await storageService.getToken();
 
     try {
@@ -73,18 +73,22 @@ class BetService implements BetInterface {
         Uri.parse('$_apiBaseUrl/userBets/check/$betId'),
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
       );
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        // Convertimos a int por si Laravel devuelve un String de la base de datos
-        return double.parse(data['total_bet'].toString()).toInt();
+        return {
+          'amount': double.parse(data['total_bet'].toString()).toInt(),
+          'winner_selected':
+              data['winner_selected'], // Añadimos el equipo elegido
+        };
       }
-      return 0;
+      return {'amount': 0, 'winner_selected': null};
     } catch (e) {
-      return 0; // Si hay error de red, asumimos que es 0 para no bloquear la UI
+      return {'amount': 0, 'winner_selected': null};
     }
   }
 

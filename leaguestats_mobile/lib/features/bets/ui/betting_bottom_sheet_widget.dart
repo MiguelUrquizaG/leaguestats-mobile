@@ -31,7 +31,6 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
   @override
   void initState() {
     super.initState();
-    // 1. LA UI SOLO DISPARA EL EVENTO PARA VERIFICAR SI HAY DINERO APOSTADO
     context.read<BetsPageBloc>().add(
       LoadPreviousBetEvent(betId: widget.bet.id!),
     );
@@ -99,6 +98,25 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
       builder: (context, state) {
         final isLoading = state is BetsPageLoading;
 
+        // --- LÓGICA DE VALIDACIÓN ---
+        int currentBetAmount = 0;
+        int? currentWinnerSelected;
+
+        if (state is PreviousBetSuccess) {
+          currentBetAmount = state.amount;
+          currentWinnerSelected = state.winnerSelected;
+        }
+
+        // ¿Apostó por ESTE mismo equipo?
+        bool hasBetOnThisTeam =
+            currentWinnerSelected != null &&
+            currentWinnerSelected == widget.teamId;
+        // ¿Apostó por el OTRO equipo?
+        bool hasBetOnOtherTeam =
+            currentWinnerSelected != null &&
+            currentWinnerSelected != widget.teamId;
+        // ----------------------------
+
         return Container(
           decoration: BoxDecoration(
             color: sheetColor,
@@ -165,8 +183,8 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
               ),
               const SizedBox(height: 12),
 
-              // --- ZONA DINÁMICA DE RETIRO BASADA EXCLUSIVAMENTE EN EL ESTADO ---
-              if (state is PreviousBetSuccess && state.amount > 0)
+              // --- ZONA DINÁMICA DE AVISOS ---
+              if (hasBetOnThisTeam && currentBetAmount > 0)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
@@ -188,7 +206,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Ya tienes apostados ${state.amount}€',
+                            'Ya tienes apostados ${currentBetAmount}€ a este equipo',
                             style: const TextStyle(
                               color: Colors.blueAccent,
                               fontSize: 13,
@@ -205,7 +223,6 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                           onPressed: isLoading
                               ? null
                               : () {
-                                  // 2. LA UI SOLO DISPARA EL EVENTO DE RETIRAR
                                   context.read<BetsPageBloc>().add(
                                     WithdrawBetEvent(betId: widget.bet.id!),
                                   );
@@ -228,7 +245,41 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                     ],
                   ),
                 ),
-              if (state is BetsPageLoading)
+
+              if (hasBetOnOtherTeam)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.redAccent.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                        color: Colors.redAccent,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Ya has apostado al otro equipo. No puedes apostar a ambos.',
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (isLoading)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16.0),
                   child: Text(
@@ -300,10 +351,10 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                   SizedBox(
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: isLoading
+                      // BLOQUEAMOS EL BOTÓN SI ESTÁ CARGANDO O SI YA APOSTÓ AL OTRO EQUIPO
+                      onPressed: (isLoading || hasBetOnOtherTeam)
                           ? null
                           : () {
-                              // 3. LA UI SOLO DISPARA EL EVENTO DE APOSTAR
                               final requestDto = PlaceBetRequestDto(
                                 betId: widget.bet.id,
                                 amount: selectedAmount,
@@ -315,7 +366,9 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                               );
                             },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryOrange,
+                        backgroundColor: hasBetOnOtherTeam
+                            ? Colors.grey
+                            : primaryOrange,
                         foregroundColor: Colors.white,
                         elevation: 4,
                         shape: RoundedRectangleBorder(
@@ -356,7 +409,8 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                     final amount = presetAmounts[index];
                     final isSelected = amount == selectedAmount;
                     return GestureDetector(
-                      onTap: isLoading
+                      // BLOQUEAMOS LOS CHIPS SI YA APOSTÓ AL OTRO EQUIPO
+                      onTap: (isLoading || hasBetOnOtherTeam)
                           ? null
                           : () => setState(() => selectedAmount = amount),
                       child: Container(

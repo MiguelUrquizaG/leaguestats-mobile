@@ -17,7 +17,8 @@ final class BetsPlaceSuccess extends BetsPageState {}
 
 final class PreviousBetSuccess extends BetsPageState {
   final int amount;
-  PreviousBetSuccess({required this.amount});
+  final int? winnerSelected;
+  PreviousBetSuccess({required this.amount, this.winnerSelected});
 }
 
 final class WithdrawBetSuccess extends BetsPageState {}

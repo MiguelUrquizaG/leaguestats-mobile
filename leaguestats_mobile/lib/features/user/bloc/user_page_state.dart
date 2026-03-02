@@ -13,6 +13,11 @@ final class UserPageSuccess extends UserPageState {
   UserPageSuccess({required this.dto});
 }
 
+class UserAddBalanceError extends UserPageState {
+  final String message;
+  UserAddBalanceError({required this.message});
+}
+
 final class UserPageError extends UserPageState {
   final String message;
 

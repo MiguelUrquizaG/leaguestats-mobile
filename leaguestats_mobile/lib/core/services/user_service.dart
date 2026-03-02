@@ -60,9 +60,7 @@ class UserService implements UserInterface {
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         // Mapeamos directamente como haces en el login
-        final userProfile = UserResponseDto.fromJson(
-          jsonDecode(response.body),
-        );
+        final userProfile = UserResponseDto.fromJson(jsonDecode(response.body));
         return userProfile;
       } else {
         throw Exception(_extractErrorMessage(response));
@@ -78,6 +76,34 @@ class UserService implements UserInterface {
     try {
       final email = await getCurrentUserEmail();
       return await getUserProfileByEmail(email);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<void> addBalance(double amount) async {
+    final token = await _storageService.getToken();
+
+    // Simulamos 1.5 segundos de carga de pasarela de pago
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    final response = await http.post(
+      Uri.parse('$_apiUrl/usersProfile/deposit'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'amount': amount}),
+    );
+
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return;
+      } else {
+        throw Exception("Error al añadir saldo: ${response.body}");
+      }
     } catch (e) {
       throw Exception(e.toString());
     }

@@ -20,3 +20,4 @@ final class WithdrawBetEvent extends BetsPageEvent {
   final int betId;
   WithdrawBetEvent({required this.betId});
 }
+

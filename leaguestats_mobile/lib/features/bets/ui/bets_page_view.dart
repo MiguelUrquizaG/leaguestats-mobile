@@ -486,7 +486,13 @@ class _BetsPageViewState extends State<BetsPageView> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const AddBalancePageView()),
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context
+                        .read<UserPageBloc>(), // Pasa el BLoC a la nueva vista
+                    child: const AddBalancePageView(),
+                  ),
+                ),
               );
             },
             style: ElevatedButton.styleFrom(

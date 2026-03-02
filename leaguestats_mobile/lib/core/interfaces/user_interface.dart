@@ -4,4 +4,5 @@ abstract class UserInterface {
 	Future<UserResponseDto> getCurrentUserProfile();
 	Future<String> getCurrentUserEmail();
 	Future<UserResponseDto> getUserProfileByEmail(String email);
+  Future<void>addBalance(double amount);
 }

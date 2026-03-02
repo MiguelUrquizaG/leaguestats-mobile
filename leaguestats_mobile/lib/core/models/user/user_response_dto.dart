@@ -1,4 +1,18 @@
 class UserResponseDto {
+  static int? _toInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
+  static double? _toDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString());
+  }
+
   int? id;
   String? username;
   int? ratedMatches;
@@ -9,7 +23,7 @@ class UserResponseDto {
   int? teamId;
   int? leagueId;
   int? isPremium;
-  int? balance;
+  double? balance;
   String? createdAt;
   String? updatedAt;
   User? user;
@@ -36,17 +50,17 @@ class UserResponseDto {
   });
 
   UserResponseDto.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = _toInt(json['id']);
     username = json['username'];
-    ratedMatches = json['rated_matches'];
-    followers = json['followers'];
-    countryId = json['country_id'];
-    userId = json['user_id'];
-    banned = json['banned'];
-    teamId = json['team_id'];
-    leagueId = json['league_id'];
-    isPremium = json['isPremium'];
-    balance = json['balance'];
+    ratedMatches = _toInt(json['rated_matches']);
+    followers = _toInt(json['followers']);
+    countryId = _toInt(json['country_id']);
+    userId = _toInt(json['user_id']);
+    banned = _toInt(json['banned']);
+    teamId = _toInt(json['team_id']);
+    leagueId = _toInt(json['league_id']);
+    isPremium = _toInt(json['isPremium']);
+    balance = _toDouble(json['balance']);
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
@@ -89,7 +103,7 @@ class User {
   String? name;
   String? email;
   String? role;
-  Null? emailVerifiedAt;
+  Null emailVerifiedAt;
   String? createdAt;
   String? updatedAt;
 
@@ -104,7 +118,7 @@ class User {
   });
 
   User.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = UserResponseDto._toInt(json['id']);
     name = json['name'];
     email = json['email'];
     role = json['role'];
@@ -136,7 +150,7 @@ class Country {
   Country({this.id, this.name, this.flag, this.createdAt, this.updatedAt});
 
   Country.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = UserResponseDto._toInt(json['id']);
     name = json['name'];
     flag = json['flag'];
     createdAt = json['created_at'];
@@ -180,13 +194,13 @@ class Team {
   });
 
   Team.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = UserResponseDto._toInt(json['id']);
     name = json['name'];
     logo = json['logo'];
-    countryId = json['country_id'];
-    lostMatches = json['lost_matches'];
-    wonMatches = json['won_matches'];
-    leagueId = json['league_id'];
+    countryId = UserResponseDto._toInt(json['country_id']);
+    lostMatches = UserResponseDto._toInt(json['lost_matches']);
+    wonMatches = UserResponseDto._toInt(json['won_matches']);
+    leagueId = UserResponseDto._toInt(json['league_id']);
     teamWallpaper = json['team_wallpaper'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
