@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
 import 'package:leaguestats_mobile/features/login/bloc/login_page_bloc.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import '../../home/ui/home_page_view.dart';
@@ -40,7 +41,7 @@ class _LoginPageViewState extends State<LoginPageView> {
         listener: (context, state) {
           if (state is LoginPageSuccess) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const HomePageView()),
+              MaterialPageRoute(builder: (_) => const BetsPageView()),
             );
           } else if (state is LoginPageError) {
             ScaffoldMessenger.of(context).showSnackBar(
