@@ -5,15 +5,21 @@ sealed class NewsPageState {}
 
 final class NewsPageInitial extends NewsPageState {}
 
-final class NewsPageLoading extends NewsPageState{}
+final class NewsPageLoading extends NewsPageState {}
 
-final class NewsPageSuccess extends NewsPageState{
+final class NewsPageSuccess extends NewsPageState {
   final List<NewsResponseDto> dto;
 
   NewsPageSuccess({required this.dto});
 }
 
-final class NewsPageError extends NewsPageState{
+final class NewsPageSingleSuccess extends NewsPageState {
+  final NewsResponseDto dto;
+
+  NewsPageSingleSuccess({required this.dto});
+}
+
+final class NewsPageError extends NewsPageState {
   final String message;
 
   NewsPageError({required this.message});

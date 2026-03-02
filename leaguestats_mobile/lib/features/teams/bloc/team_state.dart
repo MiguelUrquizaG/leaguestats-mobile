@@ -12,8 +12,14 @@ class TeamLoaded extends TeamState {
   final List<TeamListResponseDto> teams;
 }
 
+class SingleTeamLoaded extends TeamState {
+  final TeamListResponseDto dto;
+
+  SingleTeamLoaded({required this.dto});
+}
+
 class TeamError extends TeamState {
   TeamError({required this.message});
-
+  
   final String message;
 }

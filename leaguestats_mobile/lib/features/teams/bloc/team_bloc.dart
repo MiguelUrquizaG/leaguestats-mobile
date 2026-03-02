@@ -16,6 +16,15 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
         emit(TeamError(message: e.toString()));
       }
     });
+    on<GetByIdEvent>((event, emit) async {
+      emit(TeamLoading());
+      try {
+        var team = await _teamService.getById(event.id);
+        emit(SingleTeamLoaded(dto: team));
+      } catch (e) {
+        emit(TeamError(message: e.toString()));
+      }
+    });
   }
 
   final TeamService _teamService;

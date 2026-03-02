@@ -75,9 +75,17 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                       fit: StackFit.expand,
                       children: [
                         Image.network(
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuCvOlcsOaqWQHMX_p28toJlFD3beUYMHwm-fNi7Wi_vfMxSsw8gLR2JNX_5FV8eUTpL4EZYeEv3tH0gGDkKqPsDAiQ0TVJs1pqFx3YqPTspXfugHcVExpTf9-VkqjpXpDQx7XXAhnEyvZK5_90D3JGtTtkZEaB1Ac0OT7iAlRlKxFcFlGIBspIDRouQbUlcarlhSTZMHtNhj7Ne_ke4cnQv8qsE45XB4pZsBxqsgcE9R4Nd1qWFTEE3yXCkMEN_E9ZruYU61i0b0os',
+                          'https://giffiles.alphacoders.com/214/214339.gif',
                           fit: BoxFit.cover,
                           alignment: Alignment.topCenter,
+                          // Si la URL falla, muestra un fondo negro liso en lugar de un error
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(color: Colors.black),
+                          // Mientras carga, muestra un color gris oscuro
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(color: Colors.grey[900]);
+                          },
                         ),
                         // Gradient overlay
                         Container(
@@ -95,6 +103,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                           ),
                         ),
                         // Diamond icon at the bottom of the image section
+                        // Diamond icon at the bottom of the image section
                         Positioned(
                           bottom: 16,
                           left: 0,
@@ -108,14 +117,13 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                                 children: [
                                   SvgPicture.string(
                                     '''
-                                <svg fill="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M50 20L20 50L50 80L80 50L50 20Z" stroke="white" stroke-linejoin="round" stroke-width="8"></path>
-                                  <path d="M50 35L35 50L50 65L65 50L50 35Z" fill="white"></path>
-                                </svg>
-                                ''',
+        <svg fill="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 20L20 50L50 80L80 50L50 20Z" stroke="black" stroke-linejoin="round" stroke-width="8"></path>
+          <path d="M50 35L35 50L50 65L65 50L50 35Z" fill="black"></path>
+        </svg>
+        ''',
                                     width: 80,
                                     height: 80,
-                                    // Apply drop shadow (approximate using color filter if needed, but not strictly necessary for simple SVG)
                                   ),
                                 ],
                               ),
@@ -136,7 +144,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                           const SizedBox(height: 8), // Adjusted padding
                           // Title
                           Text(
-                            'Enter the Arena',
+                            'LeagueStats',
                             style: GoogleFonts.inter(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -148,7 +156,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                           const SizedBox(height: 12),
                           // Subtitle
                           Text(
-                            'Experience the next level of competitive gaming. Join the battle today.',
+                            'Disfruta de la mejor aplicación de competitivo de League of Legends.',
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               color: subtitleColor,
@@ -236,44 +244,6 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24.0,
                       vertical: 16.0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '9:41',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.signal_cellular_alt,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.wifi,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Transform.rotate(
-                              angle: 3.14159 / 2, // 90 degrees
-                              child: const Icon(
-                                Icons.battery_full,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ),
                   ),
                 ),

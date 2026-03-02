@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/core/models/news/news_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 
 class NewsSearchPageView extends StatefulWidget {
   const NewsSearchPageView({super.key});
@@ -16,6 +17,9 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   final TextEditingController _searchController = TextEditingController();
   late final NewsPageBloc _newsPageBloc;
 
+  // Estado para la pestaña seleccionada
+  String _selectedTab = 'Todos';
+
   @override
   void initState() {
     super.initState();
@@ -24,7 +28,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   }
 
   void _onSearchChanged() {
-    setState(() {});
+    setState(() {}); // Redibuja para filtrar mientras se escribe
   }
 
   @override
@@ -33,6 +37,34 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
     _searchController.dispose();
     _newsPageBloc.close();
     super.dispose();
+  }
+
+  // Lógica de filtrado combinada (Búsqueda + Tipo)
+  List<NewsResponseDto> _filterNews(List<NewsResponseDto> news) {
+    final query = _searchController.text.trim().toLowerCase();
+
+    return news.where((item) {
+      // 1. Filtro por Pestaña (Mapeo a base de datos)
+      bool matchesTab = true;
+      if (_selectedTab != 'Todos') {
+        final Map<String, String> typeMapping = {
+          'Noticias': 'New',
+          'Transfer': 'Transfer',
+          'Tutoriales': 'Tutorial',
+        };
+        matchesTab = item.type == typeMapping[_selectedTab];
+      }
+
+      // 2. Filtro por consulta de búsqueda
+      bool matchesQuery = true;
+      if (query.isNotEmpty) {
+        matchesQuery =
+            item.title.toLowerCase().contains(query) ||
+            item.description.toLowerCase().contains(query);
+      }
+
+      return matchesTab && matchesQuery;
+    }).toList();
   }
 
   @override
@@ -50,7 +82,11 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 child: BlocBuilder<NewsPageBloc, NewsPageState>(
                   builder: (context, state) {
                     if (state is NewsPageInitial || state is NewsPageLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF9333EA),
+                        ),
+                      );
                     }
 
                     if (state is NewsPageError) {
@@ -59,8 +95,6 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                           'Error cargando noticias',
                           style: GoogleFonts.inter(
                             color: const Color(0xFFD1D5DB),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       );
@@ -70,16 +104,11 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                       final filteredNews = _filterNews(state.dto);
 
                       if (filteredNews.isEmpty) {
-                        final hasQuery = _searchController.text.trim().isNotEmpty;
                         return Center(
                           child: Text(
-                            hasQuery
-                                ? 'No se encontraron noticias'
-                                : 'No hay noticias disponibles',
+                            'No se encontraron resultados',
                             style: GoogleFonts.inter(
                               color: const Color(0xFF9CA3AF),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         );
@@ -97,7 +126,6 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                         },
                       );
                     }
-
                     return const SizedBox.shrink();
                   },
                 ),
@@ -107,19 +135,6 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
         ),
       ),
     );
-  }
-
-  List<NewsResponseDto> _filterNews(List<NewsResponseDto> news) {
-    final query = _searchController.text.trim().toLowerCase();
-    if (query.isEmpty) {
-      return news;
-    }
-
-    return news.where((item) {
-      return item.title.toLowerCase().contains(query) ||
-          item.description.toLowerCase().contains(query) ||
-          item.type.toLowerCase().contains(query);
-    }).toList();
   }
 
   Widget _buildTopBar() {
@@ -133,12 +148,9 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
               color: Colors.white,
               size: 20,
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: () => Navigator.of(context).pop(),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            splashRadius: 24,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -153,7 +165,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 style: GoogleFonts.inter(color: Colors.white, fontSize: 16),
                 cursorColor: const Color(0xFF9333EA),
                 decoration: InputDecoration(
-                  hintText: 'Buscar...',
+                  hintText: 'Buscar noticias...',
                   hintStyle: GoogleFonts.inter(color: const Color(0xFF6B7280)),
                   prefixIcon: const Icon(
                     Icons.search,
@@ -167,12 +179,14 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
             ),
           ),
           const SizedBox(width: 16),
-          Text(
-            'Cancelar',
-            style: GoogleFonts.inter(
-              color: const Color(0xFFD1D5DB),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          GestureDetector(
+            onTap: () => _searchController.clear(),
+            child: Text(
+              'Limpiar',
+              style: GoogleFonts.inter(
+                color: const Color(0xFFD1D5DB),
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -181,6 +195,13 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   }
 
   Widget _buildTabs() {
+    final List<String> categories = [
+      'Todos',
+      'Noticias',
+      'Transfer',
+      'Tutoriales',
+    ];
+
     return Container(
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: Color(0xFF1F2937), width: 1)),
@@ -189,17 +210,15 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
-          children: [
-            _buildTab('Competitivo', isSelected: true),
-            const SizedBox(width: 24),
-            _buildTab('Transfer', isSelected: false),
-            const SizedBox(width: 24),
-            _buildTab('Tutoriales', isSelected: false),
-            const SizedBox(width: 24),
-            _buildTab('Skins', isSelected: false),
-            const SizedBox(width: 24),
-            _buildTab('Patch Notes', isSelected: false),
-          ],
+          children: categories.map((name) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 24),
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedTab = name),
+                child: _buildTab(name, isSelected: _selectedTab == name),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
@@ -231,141 +250,123 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
     final imageUrl = news.photo.trim().isNotEmpty
         ? news.photo
         : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
-    final typeLabel =
-        news.type.trim().isNotEmpty ? news.type.toUpperCase() : 'NOTICIA';
+    final typeLabel = news.type.trim().isNotEmpty
+        ? news.type.toUpperCase()
+        : 'NOTICIA';
 
-    return Container(
-      height: 192,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0A1A2F), Color(0xFF1A0B2E)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewsDetailPage(newsId: news.id),
+          ),
+        );
+      },
+      child: Container(
+        height: 192,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0A1A2F), Color(0xFF1A0B2E)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.2,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.2,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox(),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            right: -20,
-            top: 16,
-            child: Text(
-              typeLabel,
-              style: GoogleFonts.inter(
-                fontSize: 100,
-                fontWeight: FontWeight.w900,
-                color: Colors.white.withValues(alpha: 0.05),
-                letterSpacing: -5,
-                height: 1,
-              ),
-            ),
-          ),
-          Positioned(
-            left: -30,
-            bottom: -30,
-            child: Transform.rotate(
-              angle: 1.5708,
+            // Background decoration text
+            Positioned(
+              right: -20,
+              top: 16,
               child: Text(
                 typeLabel,
                 style: GoogleFonts.inter(
-                  fontSize: 80,
+                  fontSize: 100,
                   fontWeight: FontWeight.w900,
-                  color: const Color(0xFF2DD4BF).withValues(alpha: 0.05),
-                  letterSpacing: -4,
-                  height: 1,
+                  color: Colors.white.withOpacity(0.05),
+                  letterSpacing: -5,
                 ),
               ),
             ),
-          ),
-          Center(
-            child: Opacity(
-              opacity: 0.3,
-              child: Text(
-                'NEWS',
-                style: GoogleFonts.inter(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white.withValues(alpha: 0.8),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 20,
-            top: 32,
-            width: 180,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  news.title,
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    height: 1.2,
+            // Content
+            Positioned(
+              left: 20,
+              top: 32,
+              width: 180,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    news.title,
+                    style: GoogleFonts.inter(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  news.description,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFFD1D5DB),
-                    height: 1.5,
+                  const SizedBox(height: 8),
+                  Text(
+                    news.description,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFFD1D5DB),
+                      height: 1.5,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            right: -10,
-            bottom: 0,
-            width: 160,
-            height: 190,
-            child: ShaderMask(
-              shaderCallback: (Rect bounds) {
-                return const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black, Colors.transparent],
-                  stops: [0.9, 1.0],
-                ).createShader(bounds);
-              },
-              blendMode: BlendMode.dstIn,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
+                ],
               ),
             ),
-          ),
-        ],
+            // Shaded Image overlay
+            Positioned(
+              right: -10,
+              bottom: 0,
+              width: 160,
+              height: 190,
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black, Colors.transparent],
+                    stops: [0.9, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                  errorBuilder: (_, __, ___) => const SizedBox(),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

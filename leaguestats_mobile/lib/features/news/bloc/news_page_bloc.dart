@@ -20,5 +20,14 @@ class NewsPageBloc extends Bloc<NewsPageEvent, NewsPageState> {
         emit(NewsPageError(message: e.toString()));
       }
     });
+    on<NewsGetById>((event, emit) async {
+      emit(NewsPageLoading());
+      try {
+        var news = await newsService.getById(event.id);
+        emit(NewsPageSingleSuccess(dto: news));
+      } catch (e) {
+        emit(NewsPageError(message: e.toString()));
+      }
+    });
   }
 }

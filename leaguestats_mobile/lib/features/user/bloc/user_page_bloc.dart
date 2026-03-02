@@ -46,5 +46,7 @@ class UserPageBloc extends Bloc<UserPageEvent, UserPageState> {
         emit(UserPageError(message: e.toString()));
       }
     });
+    
   }
+
 }

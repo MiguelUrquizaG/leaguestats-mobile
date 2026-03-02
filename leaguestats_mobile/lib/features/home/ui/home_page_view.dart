@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 
 // Blocs
 import 'package:leaguestats_mobile/features/register/bloc/league_bloc.dart';
-import 'package:leaguestats_mobile/features/register/bloc/team_bloc.dart';
+import 'package:leaguestats_mobile/features/teams/bloc/team_bloc.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
+import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart';
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
 
 // Servicios
@@ -106,22 +108,40 @@ class _HomePageContent extends StatelessWidget {
             ),
 
             // --- SECCIÓN NOTICIAS ---
+            // --- SECCIÓN NOTICIAS ---
             SizedBox(
               height: 200,
               child: BlocBuilder<NewsPageBloc, NewsPageState>(
                 builder: (context, state) {
                   if (state is NewsPageSuccess) {
-                    return ListView.builder(
+                    // Cambiamos builder por separated para controlar el espacio
+                    return ListView.separated(
                       scrollDirection: Axis.horizontal,
+                      // Añadimos un padding inicial para que la primera tarjeta no pegue al borde
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: state.dto.length,
+                      // Definimos el espacio entre tarjetas (aquí 20 pixeles)
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 20),
                       itemBuilder: (context, index) {
                         final item = state.dto[index];
-                        return NewsCardWidget(
-                          url: item.photo.isNotEmpty
-                              ? item.photo
-                              : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg',
-                          titulo: item.title,
-                          descripcion: item.description,
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NewsDetailPage(newsId: item.id),
+                              ),
+                            );
+                          },
+                          child: NewsCardWidget(
+                            id: item.id,
+                            url: item.photo,
+                            titulo: item.title,
+                            descripcion: item.description,
+                          ),
                         );
                       },
                     );
@@ -157,7 +177,14 @@ class _HomePageContent extends StatelessWidget {
               ),
             ),
 
-            _buildSectionTitle(context, 'Equipos'),
+            _buildSectionTitle(
+              context,
+              'Equipos',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TeamsSearchPageView()),
+              ),
+            ),
 
             // --- SECCIÓN EQUIPOS ---
             SizedBox(

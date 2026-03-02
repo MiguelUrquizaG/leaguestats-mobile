@@ -39,4 +39,28 @@ class NewsService implements NewsInterface {
       throw Exception(e.toString());
     }
   }
+
+  @override
+  Future<NewsResponseDto> getById(int id) async {
+    var token = await storage_service.getToken();
+    var response = await http.get(
+      Uri.parse("$_apiUrl/news/$id"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept':'application/json',
+        'Authorization': 'Bearer $token',
+        
+      },
+    );
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        var news = NewsResponseDto.fromJson(jsonDecode(response.body));
+        return news;
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }

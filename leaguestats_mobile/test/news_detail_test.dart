@@ -6,7 +6,7 @@ void main() {
   testWidgets('NewsDetailPage renders correctly', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: NewsDetailPage(),
+        home: NewsDetailPage(newsId: 1,),
       ),
     );
     tester.takeException();
