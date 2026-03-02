@@ -40,23 +40,28 @@ class _BetsPageViewState extends State<BetsPageView> {
     BetResponseDto bet,
     String teamSelected,
     double odd,
-    int teamId, // Añadido: ID del equipo para la API
+    int teamId,
   ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (modalContext) => MultiBlocProvider(
-        // FUNDAMENTAL: Pasar los Blocs activos al modal
         providers: [
           BlocProvider.value(value: context.read<BetsPageBloc>()),
           BlocProvider.value(value: context.read<UserPageBloc>()),
+          // AÑADIMOS EL NUEVO BLOC Y DISPARAMOS EL EVENTO
+          BlocProvider(
+            create: (_) =>
+                BetsPageBloc(BetService())
+                  ..add(LoadPreviousBetEvent(betId: bet.id!)),
+          ),
         ],
         child: BettingBottomSheetWidget(
           bet: bet,
-          teamSelected: teamSelected, // Corregido el nombre del parámetro
-          odd: odd, // Corregido el nombre del parámetro
-          teamId: teamId, // Pasamos el ID del equipo
+          teamSelected: teamSelected,
+          odd: odd,
+          teamId: teamId,
         ),
       ),
     );

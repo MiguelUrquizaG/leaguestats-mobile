@@ -48,5 +48,26 @@ class BetsPageBloc extends Bloc<BetsPageEvent, BetsPageState> {
         emit(BetsPageError(message: e.toString()));
       }
     });
+    on<LoadPreviousBetEvent>((event, emit) async {
+      emit(BetsPageLoading());
+      try {
+        // Llamamos al servicio limpio
+        int amount = await betService.checkAlreadyBetAmount(event.betId);
+        emit(PreviousBetSuccess(amount: amount));
+      } catch (e) {
+        // Si hay error (ej. red), asumimos 0 para no bloquear la UI
+        emit(PreviousBetSuccess(amount: 0));
+      }
+    });
+
+    on<WithdrawBetEvent>((event, emit) async {
+      emit(BetsPageLoading());
+      try {
+        await betService.withdrawBet(event.betId);
+        emit(WithdrawBetSuccess());
+      } catch (e) {
+        emit(BetsPageError(message: e.toString()));
+      }
+    });
   }
 }

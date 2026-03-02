@@ -13,7 +13,14 @@ final class BetsPageActiveSuccess extends BetsPageState {
   BetsPageActiveSuccess({required this.dto});
 }
 
-final class BetsPlaceSuccess extends BetsPageState{}
+final class BetsPlaceSuccess extends BetsPageState {}
+
+final class PreviousBetSuccess extends BetsPageState {
+  final int amount;
+  PreviousBetSuccess({required this.amount});
+}
+
+final class WithdrawBetSuccess extends BetsPageState {}
 
 final class BetsPageError extends BetsPageState {
   final String message;

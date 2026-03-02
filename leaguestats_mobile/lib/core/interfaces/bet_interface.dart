@@ -5,4 +5,6 @@ abstract class BetInterface {
   Future<List<BetResponseDto>> getActiveBets();
   Future<List<BetResponseDto>> getUserBets();
   Future<void> bet(PlaceBetRequestDto dto);
+  Future<int> checkAlreadyBetAmount(int betId);
+  Future<void> withdrawBet(int betId);
 }

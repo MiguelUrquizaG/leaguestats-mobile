@@ -10,3 +10,13 @@ final class BetsPlaceEvent implements BetsPageEvent {
 
   BetsPlaceEvent({required this.dto});
 }
+
+final class LoadPreviousBetEvent extends BetsPageEvent {
+  final int betId;
+  LoadPreviousBetEvent({required this.betId});
+}
+
+final class WithdrawBetEvent extends BetsPageEvent {
+  final int betId;
+  WithdrawBetEvent({required this.betId});
+}
