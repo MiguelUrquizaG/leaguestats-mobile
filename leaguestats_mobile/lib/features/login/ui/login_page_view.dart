@@ -7,6 +7,7 @@ import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import '../../home/ui/home_page_view.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../core/services/user_service.dart';
 import '../../../core/models/auth/login_request_dto.dart';
 
 class LoginPageView extends StatefulWidget {
@@ -36,7 +37,8 @@ class _LoginPageViewState extends State<LoginPageView> {
 ''';
 
     return BlocProvider(
-      create: (_) => LoginPageBloc(AuthService(), StorageService()),
+      create: (_) =>
+          LoginPageBloc(AuthService(), StorageService(), UserService()),
       child: BlocListener<LoginPageBloc, LoginPageState>(
         listener: (context, state) {
           if (state is LoginPageSuccess) {

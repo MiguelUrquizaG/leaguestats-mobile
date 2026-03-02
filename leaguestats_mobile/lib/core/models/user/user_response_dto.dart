@@ -1,6 +1,7 @@
 class UserResponseDto {
   static int? _toInt(dynamic value) {
     if (value == null) return null;
+    if (value is bool) return value ? 1 : 0;
     if (value is int) return value;
     if (value is num) return value.toInt();
     return int.tryParse(value.toString());
