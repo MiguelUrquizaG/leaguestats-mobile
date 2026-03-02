@@ -6,6 +6,7 @@ import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 import 'package:leaguestats_mobile/features/register/bloc/league_bloc.dart';
 import 'package:leaguestats_mobile/features/teams/bloc/team_bloc.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
+import 'package:leaguestats_mobile/features/teams/ui/team_deatil_page_view.dart';
 import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart';
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
 
@@ -192,14 +193,30 @@ class _HomePageContent extends StatelessWidget {
               child: BlocBuilder<TeamBloc, TeamState>(
                 builder: (context, state) {
                   if (state is TeamLoaded) {
-                    return ListView.builder(
+                    return ListView.separated(
                       scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: state.teams.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 15),
                       itemBuilder: (context, index) {
                         final team = state.teams[index];
-                        return TeamCardWidget(
-                          url: team.logo ?? '',
-                          teamName: team.name ?? 'Sin nombre',
+
+                        return GestureDetector(
+                          onTap: () {
+                            // Navegación al detalle del equipo
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TeamDetailPageView(team: team),
+                              ),
+                            );
+                          },
+                          child: TeamCardWidget(
+                            url: team.logo ?? '',
+                            teamName: team.name ?? 'Sin nombre',
+                          ),
                         );
                       },
                     );

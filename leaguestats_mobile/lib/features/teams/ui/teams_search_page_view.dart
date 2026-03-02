@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/core/models/teams/team_list_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/team_service.dart';
 import 'package:leaguestats_mobile/features/teams/bloc/team_bloc.dart';
+import 'package:leaguestats_mobile/features/teams/ui/team_deatil_page_view.dart';
 
 class TeamsSearchPageView extends StatefulWidget {
   const TeamsSearchPageView({super.key});
@@ -224,7 +225,16 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
   }
 
   Widget _buildTeamCard(TeamListResponseDto team) {
-    return Container(
+
+    return GestureDetector(
+      onTap: () {
+        // NAVEGACIÓN A LA PÁGINA DE DETALLE
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => TeamDetailPageView(team: team)),
+        );
+      },
+    child:  Container(
       height: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -323,7 +333,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildStatBadge(String label, String value, Color color) {
