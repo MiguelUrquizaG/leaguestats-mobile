@@ -75,6 +75,10 @@ class BetsPageBloc extends Bloc<BetsPageEvent, BetsPageState> {
         emit(BetsPageError(message: e.toString()));
       }
     });
+    // En bets_page_bloc.dart
+
+    // En bets_page_bloc.dart
+
     on<LoadUserBetsHistoryEvent>((event, emit) async {
       emit(BetsPageLoading());
       try {
@@ -87,9 +91,6 @@ class BetsPageBloc extends Bloc<BetsPageEvent, BetsPageState> {
 
         // 2. Buscamos el perfil para obtener el ID real de Laravel
         var userProfile = await userService.getUserProfileByEmail(email);
-        if (userProfile.id == null) {
-          throw Exception("No se pudo obtener el ID del usuario");
-        }
 
         // 3. Llamamos al servicio (que ya devuelve List<UserBetDto>)
         final List<UserBetDto> bets = await betService.getUserBetsById(
