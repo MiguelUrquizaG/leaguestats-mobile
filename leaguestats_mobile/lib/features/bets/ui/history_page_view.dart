@@ -1,10 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leaguestats_mobile/core/models/bets/user_bet_dto.dart';
+import 'package:leaguestats_mobile/core/services/settings_service.dart';
 import 'package:leaguestats_mobile/features/bets/bloc/bets_page_bloc.dart';
 import 'package:leaguestats_mobile/features/bets/widgets/bet_history_card.dart';
+import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
 
 class HistoryPageView extends StatefulWidget {
   const HistoryPageView({super.key});
@@ -15,7 +15,11 @@ class HistoryPageView extends StatefulWidget {
 
 class _HistoryPageViewState extends State<HistoryPageView>
     with SingleTickerProviderStateMixin {
+  static const double _fallbackPremiumMultiplier = 1.20;
+
   late TabController _tabController;
+  final SettingsService _settingsService = SettingsService();
+  double _premiumMultiplier = _fallbackPremiumMultiplier;
 
   bool _isOpenStatus(String? status) {
     final normalized = (status ?? '').trim().toLowerCase();
@@ -31,6 +35,24 @@ class _HistoryPageViewState extends State<HistoryPageView>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     context.read<BetsPageBloc>().add(LoadUserBetsHistoryEvent());
+    _loadPremiumMultiplier();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userBloc = context.read<UserPageBloc?>();
+      if (userBloc != null && userBloc.state is! UserPageSuccess) {
+        userBloc.add(UserProfileByEmailEvent());
+      }
+    });
+  }
+
+  Future<void> _loadPremiumMultiplier() async {
+    try {
+      final multiplier = await _settingsService.getPremiumMultiplier();
+      if (!mounted) return;
+      setState(() {
+        _premiumMultiplier = multiplier;
+      });
+    } catch (_) {}
   }
 
   @override
@@ -41,6 +63,10 @@ class _HistoryPageViewState extends State<HistoryPageView>
 
   @override
   Widget build(BuildContext context) {
+    final userState = context.watch<UserPageBloc?>()?.state;
+    final isPremiumUser =
+        userState is UserPageSuccess && userState.dto.isPremium == 1;
+
     return Scaffold(
       backgroundColor: const Color(0xFF050505), // background-dark
       appBar: PreferredSize(
@@ -161,9 +187,21 @@ class _HistoryPageViewState extends State<HistoryPageView>
                   .where((item) => _isOpenStatus(item.bet?.status))
                   .toList();
 
-              return _buildBetsList(
-                activeBets,
-                emptyMessage: 'No tienes apuestas activas',
+              return Column(
+                children: [
+                  if (isPremiumUser)
+                    _buildPremiumNotice(
+                      message:
+                          'Premium activo: retornos calculados con x${_premiumMultiplier.toStringAsFixed(2)}',
+                    ),
+                  Expanded(
+                    child: _buildBetsList(
+                      activeBets,
+                      emptyMessage: 'No tienes apuestas activas',
+                      isPremiumUser: isPremiumUser,
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -207,9 +245,21 @@ class _HistoryPageViewState extends State<HistoryPageView>
                   .where((item) => !_isOpenStatus(item.bet?.status))
                   .toList();
 
-              return _buildBetsList(
-                closedBets,
-                emptyMessage: 'No hay apuestas cerradas',
+              return Column(
+                children: [
+                  if (isPremiumUser)
+                    _buildPremiumNotice(
+                      message:
+                          'Premium activo: retornos calculados con x${_premiumMultiplier.toStringAsFixed(2)}',
+                    ),
+                  Expanded(
+                    child: _buildBetsList(
+                      closedBets,
+                      emptyMessage: 'No hay apuestas cerradas',
+                      isPremiumUser: isPremiumUser,
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -221,6 +271,7 @@ class _HistoryPageViewState extends State<HistoryPageView>
   Widget _buildBetsList(
     List<UserBetDto> bets, {
     required String emptyMessage,
+    required bool isPremiumUser,
   }) {
     if (bets.isEmpty) {
       return Center(
@@ -252,8 +303,11 @@ class _HistoryPageViewState extends State<HistoryPageView>
             ? (bet?.team1Value ?? 1).toDouble()
             : (bet?.team2Value ?? 1).toDouble();
 
-        final potentialReturn = amount * selectedOdd;
-        final cashOutValue = potentialReturn-amount;
+        final basePotentialReturn = amount * selectedOdd;
+        final potentialReturn = isPremiumUser
+          ? basePotentialReturn * _premiumMultiplier
+          : basePotentialReturn;
+        final cashOutValue = potentialReturn - amount;
 
         return BetHistoryCard(
           gameName: bet?.league?.name ?? 'Esports',
@@ -275,6 +329,41 @@ class _HistoryPageViewState extends State<HistoryPageView>
           primaryColor: const Color(0xFF8b5cf6),
         );
       },
+    );
+  }
+
+  Widget _buildPremiumNotice({required String message}) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF8b5cf6).withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color(0xFF8b5cf6).withValues(alpha: 0.45),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.workspace_premium_rounded,
+            color: Color(0xFFC4B5FD),
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFFEDE9FE),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

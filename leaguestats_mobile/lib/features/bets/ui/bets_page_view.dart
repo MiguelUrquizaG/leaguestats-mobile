@@ -43,6 +43,8 @@ class _BetsPageViewState extends State<BetsPageView> {
     double odd,
     int teamId,
   ) {
+    final userBloc = context.read<UserPageBloc?>();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -50,7 +52,13 @@ class _BetsPageViewState extends State<BetsPageView> {
       builder: (modalContext) => MultiBlocProvider(
         providers: [
           BlocProvider.value(value: context.read<BetsPageBloc>()),
-          BlocProvider.value(value: context.read<UserPageBloc>()),
+          if (userBloc != null)
+            BlocProvider.value(value: userBloc)
+          else
+            BlocProvider(
+              create: (_) =>
+                  UserPageBloc(UserService())..add(UserProfileByEmailEvent()),
+            ),
           // AÑADIMOS EL NUEVO BLOC Y DISPARAMOS EL EVENTO
           BlocProvider(
             create: (_) =>
@@ -104,32 +112,40 @@ class _BetsPageViewState extends State<BetsPageView> {
         body: SafeArea(
           child: Builder(
             builder: (context) {
-              return RefreshIndicator(
-                color: const Color(0xFF8B5CF6),
-                onRefresh: () async {
-                  context.read<BetsPageBloc>().add(BetsGetActiveEvent());
-                  context.read<UserPageBloc>().add(UserProfileByEmailEvent());
-                  context.read<LeagueBloc>().add(LoadLeaguesEvent());
-                },
-                child: Column(
-                  children: [
-                    _buildTopBar(),
-                    Expanded(
+              return Column(
+                children: [
+                  _buildTopBar(),
+                  Expanded(
+                    child: RefreshIndicator(
+                      color: const Color(0xFF8B5CF6),
+                      onRefresh: () async {
+                        context.read<BetsPageBloc>().add(BetsGetActiveEvent());
+                        context.read<UserPageBloc?>()?.add(
+                          UserProfileByEmailEvent(),
+                        );
+                        context.read<LeagueBloc>().add(LoadLeaguesEvent());
+                        await Future.delayed(const Duration(milliseconds: 500));
+                      },
                       child: ListView(
-                        physics: const BouncingScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         children: [
-                          _buildLiveHeader(),
+                          _buildLiveHeader(context),
                           const SizedBox(height: 16),
-                          BlocBuilder<UserPageBloc, UserPageState>(
-                            builder: (context, state) {
-                              String balance = (state is UserPageSuccess)
-                                  ? state.dto.balance?.toStringAsFixed(2) ??
+                          Builder(
+                            builder: (context) {
+                              final userState =
+                                  context.watch<UserPageBloc?>()?.state;
+                              final balance = (userState is UserPageSuccess)
+                                  ? userState.dto.balance?.toStringAsFixed(2) ??
                                         "0.00"
                                   : "0.00";
+
                               return _buildBalanceCard(
                                 balance,
-                                isLoading: state is UserPageLoading,
+                                isLoading: userState is UserPageLoading,
                                 context:
                                     context, // Pasamos context para navegación
                               );
@@ -173,8 +189,8 @@ class _BetsPageViewState extends State<BetsPageView> {
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               );
             },
           ),
@@ -376,7 +392,7 @@ class _BetsPageViewState extends State<BetsPageView> {
     );
   }
 
-  Widget _buildLiveHeader() {
+  Widget _buildLiveHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -429,11 +445,25 @@ class _BetsPageViewState extends State<BetsPageView> {
             // BOTÓN MIS APUESTAS
             GestureDetector(
               onTap: () {
+                final userBloc = context.read<UserPageBloc?>();
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => BlocProvider(
-                      create: (_) => BetsPageBloc(BetService()),
+                    builder: (_) => MultiBlocProvider(
+                      providers: [
+                        BlocProvider(
+                          create: (_) => BetsPageBloc(BetService()),
+                        ),
+                        if (userBloc != null)
+                          BlocProvider.value(value: userBloc)
+                        else
+                          BlocProvider(
+                            create: (_) =>
+                                UserPageBloc(UserService())
+                                  ..add(UserProfileByEmailEvent()),
+                          ),
+                      ],
                       child: const HistoryPageView(),
                     ),
                   ),
@@ -509,14 +539,26 @@ class _BetsPageViewState extends State<BetsPageView> {
           ),
           ElevatedButton(
             onPressed: () {
+              final userBloc = context.read<UserPageBloc?>();
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => BlocProvider.value(
-                    value: context
-                        .read<UserPageBloc>(), // Pasa el BLoC a la nueva vista
-                    child: const AddBalancePageView(),
-                  ),
+                  builder: (_) {
+                    if (userBloc != null) {
+                      return BlocProvider.value(
+                        value: userBloc,
+                        child: const AddBalancePageView(),
+                      );
+                    }
+
+                    return BlocProvider(
+                      create: (_) =>
+                          UserPageBloc(UserService())
+                            ..add(UserProfileByEmailEvent()),
+                      child: const AddBalancePageView(),
+                    );
+                  },
                 ),
               );
             },

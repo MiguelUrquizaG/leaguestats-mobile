@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leaguestats_mobile/core/models/bets/bet_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/bets/place_bet_request_dto.dart';
+import 'package:leaguestats_mobile/core/services/settings_service.dart';
 import 'package:leaguestats_mobile/features/bets/bloc/bets_page_bloc.dart';
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
 
@@ -25,6 +26,10 @@ class BettingBottomSheetWidget extends StatefulWidget {
 }
 
 class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
+  static const double _fallbackPremiumMultiplier = 1.20;
+  final SettingsService _settingsService = SettingsService();
+
+  double _premiumMultiplier = _fallbackPremiumMultiplier;
   int selectedAmount = 200;
   final List<int> presetAmounts = [5, 20, 50, 100, 200, 500, 1000];
 
@@ -34,11 +39,25 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
     context.read<BetsPageBloc>().add(
       LoadPreviousBetEvent(betId: widget.bet.id!),
     );
+    _loadPremiumMultiplier();
+  }
+
+  Future<void> _loadPremiumMultiplier() async {
+    try {
+      final multiplier = await _settingsService.getPremiumMultiplier();
+      if (!mounted) return;
+      setState(() {
+        _premiumMultiplier = multiplier;
+      });
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final userState = context.watch<UserPageBloc>().state;
+    final isPremiumUser =
+        userState is UserPageSuccess && userState.dto.isPremium == 1;
 
     final sheetColor = isDarkMode
         ? const Color(0xFF23252B)
@@ -115,6 +134,12 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
         bool hasBetOnOtherTeam =
             currentWinnerSelected != null &&
             currentWinnerSelected != widget.teamId;
+        final totalStakeForProjection = hasBetOnThisTeam
+          ? currentBetAmount + selectedAmount
+          : selectedAmount;
+        final basePotentialReturn = totalStakeForProjection * widget.odd;
+        final premiumPotentialReturn = basePotentialReturn * _premiumMultiplier;
+        final premiumExtra = premiumPotentialReturn - basePotentialReturn;
         // ----------------------------
 
         return Container(
@@ -288,6 +313,63 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                   ),
                 ),
 
+              if (isPremiumUser)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.amber.withOpacity(0.45)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.workspace_premium_rounded,
+                            size: 18,
+                            color: Colors.amber,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Beneficio Premium x${_premiumMultiplier.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Si ganas, esta apuesta ascendería a '
+                        '${premiumPotentialReturn.toStringAsFixed(2)}€ '
+                        '(+${premiumExtra.toStringAsFixed(2)}€ extra).',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (hasBetOnThisTeam && currentBetAmount > 0)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'Cálculo sobre total acumulado: ${currentBetAmount}€ + ${selectedAmount}€ = ${totalStakeForProjection}€',
+                    style: TextStyle(
+                      color: textSecondaryColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+
               // ------------------------------------------------
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -336,7 +418,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                             color: textSecondaryColor,
                           ),
                           Text(
-                            '${(selectedAmount * widget.odd).toStringAsFixed(2)}€',
+                            '${basePotentialReturn.toStringAsFixed(2)}€',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -355,6 +437,19 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                       onPressed: (isLoading || hasBetOnOtherTeam)
                           ? null
                           : () {
+                              if (isPremiumUser) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Premium activo: retorno posible '
+                                      '${premiumPotentialReturn.toStringAsFixed(2)}€ '
+                                      '(x${_premiumMultiplier.toStringAsFixed(2)})',
+                                    ),
+                                    backgroundColor: Colors.amber[800],
+                                  ),
+                                );
+                              }
+
                               final requestDto = PlaceBetRequestDto(
                                 betId: widget.bet.id,
                                 amount: selectedAmount,
