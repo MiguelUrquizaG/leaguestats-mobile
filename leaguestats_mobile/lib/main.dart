@@ -28,7 +28,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/register': (context) => const RegisterPageView(),
         '/login': (context) => const LoginPageView(),
-        '/home': (context) => const MainNavigationPage(),
+        '/home': (context) {
+          final index = ModalRoute.of(context)?.settings.arguments as int? ?? 0;
+          return MainNavigationPage(initialIndex: index);
+        },
         '/premium': (context) => const PremiumPage(),
         '/premium_success': (context) => const PremiumSuccessPage(),
         '/register_real': (context) => const RegisterRealPageView(),
@@ -38,14 +41,16 @@ class MyApp extends StatelessWidget {
 }
 
 class MainNavigationPage extends StatefulWidget {
-  const MainNavigationPage({super.key});
+  final int initialIndex;
+
+  const MainNavigationPage({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigationPage> createState() => _MainNavigationPageState();
 }
 
 class _MainNavigationPageState extends State<MainNavigationPage> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
 
   final List<Widget> _pages = [
     const HomePageView(),
@@ -54,6 +59,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const TeamsSearchPageView(),
     const SizedBox(), // Placeholder para el menú modal
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _onItemTapped(int index) {
     if (index == 4) {

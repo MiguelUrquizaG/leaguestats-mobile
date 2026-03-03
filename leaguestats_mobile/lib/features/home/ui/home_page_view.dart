@@ -3,12 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 
 // Blocs
-import 'package:leaguestats_mobile/features/register/bloc/league_bloc.dart';
+import 'package:leaguestats_mobile/features/leagues/bloc/league_bloc.dart';
 import 'package:leaguestats_mobile/features/teams/bloc/team_bloc.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
 import 'package:leaguestats_mobile/features/teams/ui/team_deatil_page_view.dart';
 import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart';
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
+import 'package:leaguestats_mobile/features/leagues/ui/leagues_search_page_view.dart';
+import 'package:leaguestats_mobile/features/leagues/ui/league_detail_page_view.dart';
+import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
+import 'package:leaguestats_mobile/features/login/ui/menu_component.dart';
 
 // Servicios
 import 'package:leaguestats_mobile/core/services/team_service.dart';
@@ -71,6 +75,22 @@ class _HomePageContent extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Home Page', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => const FractionallySizedBox(
+                  heightFactor: 0.65,
+                  child: MenuComponent(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -153,7 +173,14 @@ class _HomePageContent extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-            _buildSectionTitle(context, 'Ligas'),
+            _buildSectionTitle(
+              context,
+              'Ligas',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LeaguesSearchPageView()),
+              ),
+            ),
 
             // --- SECCIÓN LIGAS ---
             SizedBox(
@@ -166,9 +193,23 @@ class _HomePageContent extends StatelessWidget {
                       itemCount: state.leagues.length,
                       itemBuilder: (context, index) {
                         final league = state.leagues[index];
-                        return TeamCardWidget(
-                          url: league.logo ?? '',
-                          teamName: league.name ?? 'Sin nombre',
+                        return GestureDetector(
+                          onTap: () {
+                            if (league.id == null) return;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => LeagueDetailPageView(
+                                  leagueId: league.id!,
+                                  league: league,
+                                ),
+                              ),
+                            );
+                          },
+                          child: TeamCardWidget(
+                            url: league.logo ?? '',
+                            teamName: league.name ?? 'Sin nombre',
+                          ),
                         );
                       },
                     );
@@ -226,7 +267,14 @@ class _HomePageContent extends StatelessWidget {
               ),
             ),
 
-            _buildSectionTitle(context, 'Partidas destacadas'),
+            _buildSectionTitle(
+              context,
+              'Partidas destacadas',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BetsPageView()),
+              ),
+            ),
             const MatchCardWidget(
               iconoLiga:
                   'https://liquipedia.net/commons/images/8/8f/LCK_2021_full_lightmode.png',

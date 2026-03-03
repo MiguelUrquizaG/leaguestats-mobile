@@ -1,121 +1,157 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:leaguestats_mobile/core/models/teams/team_list_response_dto.dart';
+import 'package:leaguestats_mobile/core/services/team_service.dart';
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
 
-class TeamDetailPageView extends StatelessWidget {
+class TeamDetailPageView extends StatefulWidget {
   final TeamListResponseDto team;
 
   const TeamDetailPageView({super.key, required this.team});
 
   @override
+  State<TeamDetailPageView> createState() => _TeamDetailPageViewState();
+}
+
+class _TeamDetailPageViewState extends State<TeamDetailPageView> {
+  late final Future<TeamListResponseDto?> _teamFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _teamFuture = _loadTeamDetails();
+  }
+
+  Future<TeamListResponseDto?> _loadTeamDetails() async {
+    final teamId = widget.team.id;
+    if (teamId == null) return null;
+
+    try {
+      return await TeamService().getById(teamId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final teamName = team.name ?? 'Sin nombre';
-    final leagueName = team.league?.name ?? 'Sin Liga';
-    final countryName = team.country?.name ?? 'Internacional';
-    final teamLogo = team.logo ?? '';
-    final teamWallpaper = team.teamWallpaper ?? '';
-    final players = team.players ?? [];
-    final wonMatches = (team.wonMatches ?? 0).toString();
-    final lostMatches = (team.lostMatches ?? 0).toString();
+    return FutureBuilder<TeamListResponseDto?>(
+      future: _teamFuture,
+      builder: (context, snapshot) {
+        final resolvedTeam = snapshot.data ?? widget.team;
+        final teamName = resolvedTeam.name ?? 'Sin nombre';
+        final leagueName = resolvedTeam.league?.name ?? 'Sin Liga';
+        final countryName = resolvedTeam.country?.name ?? 'Internacional';
+        final teamLogo = resolvedTeam.logo ?? '';
+        final teamWallpaper = resolvedTeam.teamWallpaper ?? '';
+        final players = resolvedTeam.players ?? [];
+        final wonMatches = (resolvedTeam.wonMatches ?? 0).toString();
+        final lostMatches = (resolvedTeam.lostMatches ?? 0).toString();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF09090B),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF0F0F14), Color(0xFF070709)],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: -120,
-            left: -80,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF9333EA).withOpacity(0.08),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -100,
-            right: -60,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF2DD4BF).withOpacity(0.06),
-              ),
-            ),
-          ),
-          // 1. Logo de fondo más visible y grande
-          Positioned(
-            top: -20,
-            right: -60,
-            child: Opacity(
-              opacity: 0.25, // Un poco más de presencia
-              child: DynamicNetworkImage(
-                url: teamLogo,
-
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          
-          // 2. Contenido
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              _buildSliverAppBar(context),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
-                      _buildMainTeamCard(
-                        teamName,
-                        leagueName,
-                        countryName,
-                        players.length,
-                        teamLogo,
-                        teamWallpaper,
-                        wonMatches,
-                        lostMatches,
-                      ),
-                      const SizedBox(height: 40),
-                      _buildSectionHeader('PLANTILLA', '${players.length} JUGADORES'),
-                      const SizedBox(height: 20),
-                      if (players.isEmpty)
-                        _buildEmptyState()
-                      else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: players.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) => _buildEnhancedPlayerCard(players[index]),
-                        ),
-                      const SizedBox(height: 50),
-                    ],
+        return Scaffold(
+          backgroundColor: const Color(0xFF09090B),
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF0F0F14), Color(0xFF070709)],
+                    ),
                   ),
                 ),
               ),
+              Positioned(
+                top: -120,
+                left: -80,
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF9333EA).withOpacity(0.08),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -100,
+                right: -60,
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF2DD4BF).withOpacity(0.06),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: -20,
+                right: -60,
+                child: Opacity(
+                  opacity: 0.25,
+                  child: DynamicNetworkImage(
+                    url: teamLogo,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  _buildSliverAppBar(context),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          _buildMainTeamCard(
+                            teamName,
+                            leagueName,
+                            countryName,
+                            players.length,
+                            teamLogo,
+                            teamWallpaper,
+                            wonMatches,
+                            lostMatches,
+                          ),
+                          const SizedBox(height: 40),
+                          _buildSectionHeader('PLANTILLA', '${players.length} JUGADORES'),
+                          const SizedBox(height: 20),
+                          if (snapshot.connectionState == ConnectionState.waiting &&
+                              players.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF9333EA),
+                              ),
+                            )
+                          else if (players.isEmpty)
+                            _buildEmptyState()
+                          else
+                            ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: players.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 12),
+                              itemBuilder: (context, index) =>
+                                  _buildEnhancedPlayerCard(players[index]),
+                            ),
+                          const SizedBox(height: 50),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

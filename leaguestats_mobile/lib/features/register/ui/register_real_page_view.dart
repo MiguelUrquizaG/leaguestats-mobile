@@ -8,7 +8,7 @@ import 'package:leaguestats_mobile/core/services/league_service.dart';
 import 'package:leaguestats_mobile/core/services/storage_service.dart';
 import 'package:leaguestats_mobile/core/services/team_service.dart';
 import 'package:leaguestats_mobile/features/register/bloc/country_bloc.dart';
-import 'package:leaguestats_mobile/features/register/bloc/league_bloc.dart';
+import 'package:leaguestats_mobile/features/leagues/bloc/league_bloc.dart';
 import 'package:leaguestats_mobile/features/register/bloc/register_page_bloc.dart';
 import 'package:leaguestats_mobile/features/teams/bloc/team_bloc.dart';
 

@@ -12,6 +12,18 @@ class LeagueLoaded extends LeagueState {
   final List<LeagueListResponseDto> leagues;
 }
 
+final class SingleLeagueLoaded extends LeagueState {
+  final LeagueListResponseDto dto;
+
+  SingleLeagueLoaded({required this.dto});
+}
+
+final class LeagueTeamsLoaded extends LeagueState {
+  final List<LeagueTeamResponseDto> dto;
+
+  LeagueTeamsLoaded({required this.dto});
+}
+
 class LeagueError extends LeagueState {
   LeagueError({required this.message});
 

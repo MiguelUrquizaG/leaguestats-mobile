@@ -9,7 +9,7 @@ import 'package:leaguestats_mobile/features/bets/ui/add_balance_page_view.dart';
 import 'package:leaguestats_mobile/features/bets/ui/betting_bottom_sheet_widget.dart';
 import 'package:leaguestats_mobile/features/bets/ui/history_page_view.dart';
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
-import 'package:leaguestats_mobile/features/register/bloc/league_bloc.dart';
+import 'package:leaguestats_mobile/features/leagues/bloc/league_bloc.dart';
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
 
 class BetsPageView extends StatefulWidget {

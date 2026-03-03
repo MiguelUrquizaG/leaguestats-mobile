@@ -6,6 +6,7 @@ import 'package:leaguestats_mobile/features/profile/ui/profile_page_view.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
 import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart';
+import 'package:leaguestats_mobile/features/leagues/ui/leagues_search_page_view.dart';
 
 class MenuComponent extends StatefulWidget {
   const MenuComponent({super.key});
@@ -151,9 +152,15 @@ class _MenuComponentState extends State<MenuComponent> {
                     );
                   },
                 ),
-                const _MenuItem(
+                _MenuItem(
                   icon: Icons.emoji_events_rounded,
                   title: 'Ligas',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LeaguesSearchPageView()),
+                    );
+                  },
                 ),
                 const _MenuItem(
                   icon: Icons.person_rounded,
