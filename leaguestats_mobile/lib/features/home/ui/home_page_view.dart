@@ -21,8 +21,6 @@ import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
-import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
-import 'package:leaguestats_mobile/features/login/ui/menu_component.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import 'package:leaguestats_mobile/features/profile/profile.dart';
 
@@ -241,7 +239,6 @@ class _HomePageContent extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
@@ -317,53 +314,6 @@ class _HomePageContent extends StatelessWidget {
           onPressed: onTap,
           child: const Text('Ver todo', style: TextStyle(color: Colors.grey)),
         ),
-      ],
-    );
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: const Color.fromARGB(255, 36, 36, 36),
-      selectedItemColor: Colors.blueAccent,
-      unselectedItemColor: Colors.white,
-      onTap: (index) {
-        if (index == 1) {
-          // Noticias
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const NewsSearchPageView()),
-          );
-        } else if (index == 2) {
-          // Apuestas
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const BetsPageView()),
-          );
-        } else if (index == 4) {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (_) => const FractionallySizedBox(
-              heightFactor: 0.65,
-              child: MenuComponent(),
-            ),
-          );
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Inicio'),
-        BottomNavigationBarItem(icon: Icon(Icons.newspaper), label: 'Noticias'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.attach_money),
-          label: 'Apuestas',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.data_usage),
-          label: 'Estadísticas',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
       ],
     );
   }

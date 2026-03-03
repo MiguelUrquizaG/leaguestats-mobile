@@ -32,6 +32,10 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
   double _premiumMultiplier = _fallbackPremiumMultiplier;
   int selectedAmount = 200;
   final List<int> presetAmounts = [5, 20, 50, 100, 200, 500, 1000];
+  
+  // Variables para guardar el estado anterior
+  int _lastKnownBetAmount = 0;
+  int? _lastKnownWinnerSelected;
 
   @override
   void initState() {
@@ -105,17 +109,16 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
               backgroundColor: Colors.blue,
             ),
           );
-        } else if (state is BetsPageError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${state.message}'),
-              backgroundColor: Colors.red,
-            ),
-          );
         }
       },
       builder: (context, state) {
         final isLoading = state is BetsPageLoading;
+        
+        // Capturar si hay un error anterior
+        String? errorMessage;
+        if (state is BetsPageError) {
+          errorMessage = state.message;
+        }
 
         // --- LÓGICA DE VALIDACIÓN ---
         int currentBetAmount = 0;
@@ -124,6 +127,13 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
         if (state is PreviousBetSuccess) {
           currentBetAmount = state.amount;
           currentWinnerSelected = state.winnerSelected;
+          // Guardar en variables de instancia para mantener incluso si hay error
+          _lastKnownBetAmount = currentBetAmount;
+          _lastKnownWinnerSelected = currentWinnerSelected;
+        } else if (state is BetsPageError) {
+          // Si hay un error, usar los valores guardados anteriormente
+          currentBetAmount = _lastKnownBetAmount;
+          currentWinnerSelected = _lastKnownWinnerSelected;
         }
 
         // ¿Apostó por ESTE mismo equipo?
@@ -212,30 +222,55 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
               if (hasBetOnThisTeam && currentBetAmount > 0)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.blueAccent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.blueAccent.withOpacity(0.3),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blueAccent.withOpacity(0.08),
+                        Colors.cyan.withOpacity(0.03),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.blueAccent.withOpacity(0.25),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueAccent.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
                       Row(
                         children: [
-                          const Icon(
-                            Icons.info_outline,
-                            size: 16,
-                            color: Colors.blueAccent,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Ya tienes apostados ${currentBetAmount}€ a este equipo',
-                            style: const TextStyle(
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.blueAccent.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.info_rounded,
+                              size: 20,
                               color: Colors.blueAccent,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Tienes apostados ${currentBetAmount}€',
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.3,
+                              ),
                             ),
                           ),
                         ],
@@ -253,17 +288,101 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                                   );
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent.withOpacity(0.1),
+                            backgroundColor: Colors.redAccent.withOpacity(0.12),
                             foregroundColor: Colors.redAccent,
                             elevation: 0,
-                            side: const BorderSide(color: Colors.redAccent),
+                            side: BorderSide(
+                              color: Colors.redAccent.withOpacity(0.3),
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           child: const Text(
                             'Retirar Apuesta',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // --- MOSTRAR ERRORES EN EL MODAL ---
+              if (errorMessage != null)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFEF4444).withOpacity(0.08),
+                        const Color(0xFFDC2626).withOpacity(0.03),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFFEF4444).withOpacity(0.25),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFEF4444).withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.warning_rounded,
+                              color: Color(0xFFEF4444),
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'No se pudo realizar la apuesta',
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Saldo insuficiente',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                            fontSize: 12.5,
+                            height: 1.5,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -274,29 +393,52 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
               if (hasBetOnOtherTeam)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.redAccent.withOpacity(0.3),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.orangeAccent.withOpacity(0.08),
+                        Colors.deepOrange.withOpacity(0.03),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.orangeAccent.withOpacity(0.25),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orangeAccent.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.warning_amber_rounded,
-                        size: 20,
-                        color: Colors.redAccent,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.orangeAccent.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.block_rounded,
+                          size: 20,
+                          color: Colors.orangeAccent,
+                        ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Ya has apostado al otro equipo. No puedes apostar a ambos.',
-                          style: const TextStyle(
-                            color: Colors.redAccent,
+                          'Ya has apostado al otro equipo. Elige uno.',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 0, 0, 0),
                             fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
                           ),
                         ),
                       ),
@@ -316,41 +458,73 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
               if (isPremiumUser)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.amber.withOpacity(0.45)),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.amber.withOpacity(0.12),
+                        Colors.yellow.withOpacity(0.03),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.amber.withOpacity(0.3),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Icon(
-                            Icons.workspace_premium_rounded,
-                            size: 18,
-                            color: Colors.amber,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Beneficio Premium x${_premiumMultiplier.toStringAsFixed(2)}',
-                            style: TextStyle(
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.workspace_premium_rounded,
+                              size: 20,
                               color: Colors.amber,
-                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'x${_premiumMultiplier.toStringAsFixed(2)} Multiplicador',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              letterSpacing: 0.3,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Si ganas, esta apuesta ascendería a '
-                        '${premiumPotentialReturn.toStringAsFixed(2)}€ '
-                        '(+${premiumExtra.toStringAsFixed(2)}€ extra).',
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Ganancia potencial: ${premiumPotentialReturn.toStringAsFixed(2)}€ (+${premiumExtra.toStringAsFixed(2)}€ bonus)',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.5,
+                            height: 1.4,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
