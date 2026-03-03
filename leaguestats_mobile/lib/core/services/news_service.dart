@@ -145,10 +145,32 @@ class NewsService implements NewsInterface {
         'Authorization': 'Bearer $token',
       },
     );
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        var listComments = NewsCommentResponseDto.fromJsonList(
+          jsonDecode(response.body),
+        );
+        return listComments;
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteComment(int idNews) async {
+    var token = await storage_service.getToken();
+    var response = await http.delete(
+      Uri.parse('$_apiUrl/news-comments/$idNews'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     try{
       if(response.statusCode>=200 && response.statusCode<300){
-        var listComments = NewsCommentResponseDto.fromJsonList(jsonDecode(response.body));
-        return listComments;
       }else{
         throw Exception(response.body);
       }
@@ -156,4 +178,10 @@ class NewsService implements NewsInterface {
       throw Exception(e.toString());
     }
   }
+  
+  // @override
+  // Future<void> likeComment(int idNews) async{
+  //   var token = await storage_service.getToken();
+  //   var response = await http.post(Uri.parse('$_apiUrl/'))
+  // }
 }

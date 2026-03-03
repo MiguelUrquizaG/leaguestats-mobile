@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/core/models/news/comment_request_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
+import 'package:leaguestats_mobile/core/services/storage_service.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
 
 String _formatTimeAgo(String? dateString) {
@@ -45,15 +46,54 @@ class CommentsModal extends StatefulWidget {
 
 class _CommentsModalState extends State<CommentsModal> {
   final TextEditingController _commentController = TextEditingController();
+  final StorageService _storageService = StorageService();
   List<NewsCommentResponseDto> _comments = [];
-  final Set<int> _editableCommentIds = <int>{};
+  List<NewsCommentResponseDto> _userComments = [];
   bool _isFetchingComments = true;
   bool _isSendingComment = false;
   int? _editingCommentId;
+  int? _deletingCommentId;
+  String? _currentUserEmail;
 
   void _safeSetState(VoidCallback fn) {
     if (!mounted) return;
     setState(fn);
+  }
+
+  bool _isUserComment(NewsCommentResponseDto comment) {
+    final commentEmail = comment.userProfile?.user?.email;
+    final currentEmail = _currentUserEmail;
+
+    if (currentEmail != null && currentEmail.isNotEmpty) {
+      return commentEmail != null &&
+          commentEmail.toLowerCase() == currentEmail.toLowerCase();
+    }
+
+    final userIds = _userComments
+        .map((userComment) => userComment.userId)
+        .whereType<int>()
+        .toSet();
+
+    if (userIds.isEmpty || comment.userId == null) {
+      return false;
+    }
+
+    return userIds.contains(comment.userId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUserEmail();
+  }
+
+  Future<void> _loadCurrentUserEmail() async {
+    final email = await _storageService.getEmail();
+    if (!mounted) return;
+
+    _safeSetState(() {
+      _currentUserEmail = email;
+    });
   }
 
   @override
@@ -160,6 +200,62 @@ class _CommentsModalState extends State<CommentsModal> {
     );
   }
 
+  void _deleteComment(BuildContext blocContext, NewsCommentResponseDto comment) {
+    final commentId = comment.id;
+    if (commentId == null || _isSendingComment) {
+      return;
+    }
+
+    _safeSetState(() {
+      _isSendingComment = true;
+      _deletingCommentId = commentId;
+      _editingCommentId = null;
+    });
+
+    blocContext.read<NewsPageBloc>().add(
+      DeleteCommentUser(idNews: commentId),
+    );
+  }
+
+  Future<void> _showDeleteDialog(
+    BuildContext blocContext,
+    NewsCommentResponseDto comment,
+  ) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: Text(
+            'Eliminar comentario',
+            style: GoogleFonts.splineSans(color: Colors.white),
+          ),
+          content: Text(
+            '¿Seguro que quieres eliminar este comentario?',
+            style: GoogleFonts.merriweather(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _deleteComment(blocContext, comment);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade600,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xFFAD2BEE);
@@ -193,6 +289,7 @@ class _CommentsModalState extends State<CommentsModal> {
             _safeSetState(() {
               _isSendingComment = false;
               _editingCommentId = null;
+              _deletingCommentId = null;
             });
 
             if (!wasEditing) {
@@ -204,10 +301,22 @@ class _CommentsModalState extends State<CommentsModal> {
             context.read<NewsPageBloc>().add(GetCommentsUserNews(idNews: widget.newsId));
           }
 
+          if (state is DeleteCommentSuccess) {
+            _safeSetState(() {
+              _isSendingComment = false;
+              _deletingCommentId = null;
+              _editingCommentId = null;
+            });
+
+            context.read<NewsPageBloc>().add(NewsGetComments(id: widget.newsId));
+            context.read<NewsPageBloc>().add(GetCommentsUserNews(idNews: widget.newsId));
+          }
+
           if (state is CommentError) {
             _safeSetState(() {
               _isSendingComment = false;
               _editingCommentId = null;
+              _deletingCommentId = null;
             });
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -223,13 +332,7 @@ class _CommentsModalState extends State<CommentsModal> {
 
           if (state is GetCommentsUserNewsSuccess) {
             _safeSetState(() {
-              _editableCommentIds
-                ..clear()
-                ..addAll(
-                  state.dto
-                      .map((comment) => comment.id)
-                      .whereType<int>(),
-                );
+              _userComments = state.dto;
             });
           }
         },
@@ -345,8 +448,7 @@ class _CommentsModalState extends State<CommentsModal> {
                         itemCount: _comments.length,
                         itemBuilder: (context, index) {
                           final comment = _comments[index];
-                          final canEdit =
-                              comment.id != null && _editableCommentIds.contains(comment.id);
+                          final canEdit = _isUserComment(comment);
                           return _buildCommentCard(
                             context,
                             comment,
@@ -528,16 +630,41 @@ class _CommentsModalState extends State<CommentsModal> {
                   ),
                 ),
                 if (canEdit)
-                  IconButton(
-                    onPressed: _isSendingComment
-                        ? null
-                        : () => _showEditDialog(blocContext, comment),
-                    icon: Icon(
-                      Icons.edit_outlined,
-                      size: 18,
-                      color: primaryColor,
-                    ),
-                    tooltip: 'Editar comentario',
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: _isSendingComment
+                            ? null
+                            : () => _showEditDialog(blocContext, comment),
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: primaryColor,
+                        ),
+                        tooltip: 'Editar comentario',
+                      ),
+                      IconButton(
+                        onPressed: _isSendingComment
+                            ? null
+                            : () => _showDeleteDialog(blocContext, comment),
+                        icon: comment.id == _deletingCommentId && _isSendingComment
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.red,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.delete_outline,
+                                size: 18,
+                                color: Colors.redAccent,
+                              ),
+                        tooltip: 'Eliminar comentario',
+                      ),
+                    ],
                   ),
               ],
             ),

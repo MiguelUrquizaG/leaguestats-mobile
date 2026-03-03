@@ -34,6 +34,7 @@ final class NewsCommentsSuccess extends NewsPageState {
 
   NewsCommentsSuccess({required this.dto});
 }
+final class DeleteCommentSuccess extends NewsPageState{}
 
 final class NewsPageError extends NewsPageState {
   final String message;

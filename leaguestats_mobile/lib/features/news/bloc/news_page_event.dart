@@ -36,3 +36,9 @@ final class GetCommentsUserNews extends NewsPageEvent {
 
   GetCommentsUserNews({required this.idNews});
 }
+
+final class DeleteCommentUser extends NewsPageEvent {
+  final int idNews;
+
+  DeleteCommentUser({required this.idNews});
+}

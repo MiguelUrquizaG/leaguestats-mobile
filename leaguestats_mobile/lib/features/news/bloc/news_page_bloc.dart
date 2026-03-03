@@ -68,5 +68,14 @@ class NewsPageBloc extends Bloc<NewsPageEvent, NewsPageState> {
         emit(NewsPageError(message: e.toString()));
       }
     });
+    on<DeleteCommentUser>((event, emit) async {
+      emit(CommentLoading());
+      try {
+        await newsService.deleteComment(event.idNews);
+        emit(DeleteCommentSuccess());
+      } catch (e) {
+        emit(CommentError(message: e.toString()));
+      }
+    });
   }
 }

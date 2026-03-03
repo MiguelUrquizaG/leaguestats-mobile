@@ -10,4 +10,6 @@ abstract class NewsInterface {
   Future<void>postComment(CommentRequestDto dto, int idNews);
   Future<void>updateComment(CommentRequestDto dto,int idNews);
   Future<List<NewsCommentResponseDto>>findCommentsUserNew(int idNews);
+  Future<void>deleteComment(int idNews);
+  // Future<void>likeComment(int idNews);
 }
