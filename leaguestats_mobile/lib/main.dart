@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/login/ui/login_page_view.dart';
-import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
+import 'package:leaguestats_mobile/features/premiun/ui/premium_page.dart';
+import 'package:leaguestats_mobile/features/premiun/ui/premium_success_page.dart';
 import 'package:leaguestats_mobile/features/register/ui/register_real_page_view.dart';
 import 'package:leaguestats_mobile/features/register/ui/register_page_view.dart';
-import 'package:leaguestats_mobile/features/register/ui/register_real_page_view.dart';
-import 'features/login/ui/login_page_view.dart';
-import 'features/register/ui/register_page_view.dart';
 import 'features/home/ui/home_page_view.dart';
 
 void main() {
@@ -28,6 +26,8 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPageView(),
         '/login': (context) => const LoginPageView(),
         '/home': (context) => const HomePageView(),
+        '/premium': (context) => const PremiumPage(),
+        '/premium_success': (context) => const PremiumSuccessPage(),
         '/register_real': (context) => const RegisterRealPageView(),
         '/news': (context) => const NewsSearchPageView(),
       },

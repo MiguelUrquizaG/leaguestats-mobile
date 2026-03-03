@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leaguestats_mobile/features/premiun/ui/premium_page.dart';
 
 class MenuComponent extends StatelessWidget {
   const MenuComponent({super.key});
@@ -323,7 +324,11 @@ class _PremiumMenuItem extends StatelessWidget {
             shape: BoxShape.circle,
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PremiumPage()),
+          );
+        },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),

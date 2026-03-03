@@ -21,6 +21,8 @@ import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
+import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
+import 'package:leaguestats_mobile/features/login/ui/menu_component.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import 'package:leaguestats_mobile/features/profile/profile.dart';
 
@@ -331,6 +333,22 @@ class _HomePageContent extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NewsSearchPageView()),
+          );
+        } else if (index == 2) {
+          // Apuestas
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const BetsPageView()),
+          );
+        } else if (index == 4) {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (_) => const FractionallySizedBox(
+              heightFactor: 0.65,
+              child: MenuComponent(),
+            ),
           );
         }
       },

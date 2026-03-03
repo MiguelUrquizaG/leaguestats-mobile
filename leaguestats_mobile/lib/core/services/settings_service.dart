@@ -34,6 +34,33 @@ class SettingsService {
     return multiplier;
   }
 
+  Future<double> getPremiumPrice({double fallback = 4.00}) async {
+    final token = await _storageService.getToken();
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+
+    try {
+      final response = await http.get(
+        Uri.parse('$_apiUrl/settings'),
+        headers: headers,
+      );
+
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return fallback;
+      }
+
+      final decoded = jsonDecode(response.body);
+      final price = _extractPremiumPrice(decoded);
+      if (price == null || price <= 0) return fallback;
+      return price;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
   double? _extractPremiumMultiplier(dynamic data) {
     const directKeys = [
       'premium_multiplier',
@@ -96,6 +123,75 @@ class SettingsService {
         }
 
         final parsed = _extractPremiumMultiplier(item);
+        if (parsed != null) return parsed;
+      }
+    }
+
+    return null;
+  }
+
+  double? _extractPremiumPrice(dynamic data) {
+    const directKeys = [
+      'premium_price',
+      'premiumPrice',
+      'premium_monthly_price',
+      'premium_month_price',
+      'subscription_price',
+      'price',
+    ];
+
+    if (data is num) return data.toDouble();
+
+    if (data is String) {
+      return double.tryParse(data);
+    }
+
+    if (data is Map<String, dynamic>) {
+      for (final key in directKeys) {
+        if (data.containsKey(key)) {
+          final parsed = _extractPremiumPrice(data[key]);
+          if (parsed != null) return parsed;
+        }
+      }
+
+      for (final entry in data.entries) {
+        final keyLower = entry.key.toLowerCase();
+        if (keyLower.contains('premium') && keyLower.contains('price')) {
+          final parsed = _extractPremiumPrice(entry.value);
+          if (parsed != null) return parsed;
+        }
+      }
+
+      if (data.containsKey('settings')) {
+        final parsed = _extractPremiumPrice(data['settings']);
+        if (parsed != null) return parsed;
+      }
+
+      if (data.containsKey('data')) {
+        final parsed = _extractPremiumPrice(data['data']);
+        if (parsed != null) return parsed;
+      }
+
+      if (data.containsKey('value')) {
+        final parsed = _extractPremiumPrice(data['value']);
+        if (parsed != null) return parsed;
+      }
+    }
+
+    if (data is List) {
+      for (final item in data) {
+        if (item is Map<String, dynamic>) {
+          final key = (item['key'] ?? item['name'] ?? item['slug'])
+              ?.toString()
+              .toLowerCase();
+          final value = item['value'] ?? item['setting_value'] ?? item['data'];
+          if (key != null && key.contains('premium') && key.contains('price')) {
+            final parsed = _extractPremiumPrice(value);
+            if (parsed != null) return parsed;
+          }
+        }
+
+        final parsed = _extractPremiumPrice(item);
         if (parsed != null) return parsed;
       }
     }

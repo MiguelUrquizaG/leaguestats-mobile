@@ -108,4 +108,22 @@ class UserService implements UserInterface {
       throw Exception(e.toString());
     }
   }
+
+  @override
+  Future<void> subscribeToPremium() async {
+    final response = await http.post(
+      Uri.parse('$_apiUrl/usersProfile/subscribe-premium'),
+      headers: await _getHeaders(),
+    );
+
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return;
+      } else {
+        throw Exception(_extractErrorMessage(response));
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }
