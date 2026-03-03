@@ -42,3 +42,15 @@ final class DeleteCommentUser extends NewsPageEvent {
 
   DeleteCommentUser({required this.idNews});
 }
+
+final class LikeCommentUser extends NewsPageEvent {
+  final int idNews;
+
+  LikeCommentUser({required this.idNews});
+}
+
+final class UnlikeCommentUser extends NewsPageEvent {
+  final int idNews;
+
+  UnlikeCommentUser({required this.idNews});
+}

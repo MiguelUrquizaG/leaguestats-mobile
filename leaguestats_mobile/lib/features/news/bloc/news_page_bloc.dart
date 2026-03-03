@@ -77,5 +77,23 @@ class NewsPageBloc extends Bloc<NewsPageEvent, NewsPageState> {
         emit(CommentError(message: e.toString()));
       }
     });
+    on<LikeCommentUser>((event, emit) async {
+      emit(CommentLoading());
+      try {
+        await newsService.likeComment(event.idNews);
+        emit(LikeCommentSuccess());
+      } catch (e) {
+        emit(CommentError(message: e.toString()));
+      }
+    });
+    on<UnlikeCommentUser>((event, emit) async {
+      emit(CommentLoading());
+      try {
+        await newsService.unlikeComment(event.idNews);
+        emit(UnlikeCommentSuccess());
+      } catch (e) {
+        emit(CommentError(message: e.toString()));
+      }
+    });
   }
 }

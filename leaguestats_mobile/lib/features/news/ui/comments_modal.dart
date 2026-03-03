@@ -45,6 +45,8 @@ class CommentsModal extends StatefulWidget {
 }
 
 class _CommentsModalState extends State<CommentsModal> {
+  static final Map<int, bool> _sessionLikedByCommentId = <int, bool>{};
+
   final TextEditingController _commentController = TextEditingController();
   final StorageService _storageService = StorageService();
   List<NewsCommentResponseDto> _comments = [];
@@ -53,6 +55,8 @@ class _CommentsModalState extends State<CommentsModal> {
   bool _isSendingComment = false;
   int? _editingCommentId;
   int? _deletingCommentId;
+  int? _likingCommentId;
+  final Map<int, bool> _likedByCommentId = <int, bool>{};
   String? _currentUserEmail;
 
   void _safeSetState(VoidCallback fn) {
@@ -79,6 +83,19 @@ class _CommentsModalState extends State<CommentsModal> {
     }
 
     return userIds.contains(comment.userId);
+  }
+
+  bool _isCommentLiked(NewsCommentResponseDto comment) {
+    final commentId = comment.id;
+    if (commentId != null && _likedByCommentId.containsKey(commentId)) {
+      return _likedByCommentId[commentId] ?? false;
+    }
+
+    if (commentId != null && _sessionLikedByCommentId.containsKey(commentId)) {
+      return _sessionLikedByCommentId[commentId] ?? false;
+    }
+
+    return comment.likedByMe ?? false;
   }
 
   @override
@@ -217,6 +234,32 @@ class _CommentsModalState extends State<CommentsModal> {
     );
   }
 
+  void _likeComment(BuildContext blocContext, NewsCommentResponseDto comment) {
+    final commentId = comment.id;
+    if (commentId == null) {
+      return;
+    }
+
+    if (_likingCommentId == commentId) {
+      return;
+    }
+
+    _safeSetState(() {
+      _likingCommentId = commentId;
+    });
+
+    if (_isCommentLiked(comment)) {
+      blocContext.read<NewsPageBloc>().add(
+        UnlikeCommentUser(idNews: commentId),
+      );
+      return;
+    }
+
+    blocContext.read<NewsPageBloc>().add(
+      LikeCommentUser(idNews: commentId),
+    );
+  }
+
   Future<void> _showDeleteDialog(
     BuildContext blocContext,
     NewsCommentResponseDto comment,
@@ -281,6 +324,13 @@ class _CommentsModalState extends State<CommentsModal> {
             _safeSetState(() {
               _comments = state.dto;
               _isFetchingComments = false;
+              for (final comment in state.dto) {
+                final commentId = comment.id;
+                if (commentId != null && comment.likedByMe != null) {
+                  _likedByCommentId[commentId] = comment.likedByMe!;
+                  _sessionLikedByCommentId[commentId] = comment.likedByMe!;
+                }
+              }
             });
           }
 
@@ -312,11 +362,36 @@ class _CommentsModalState extends State<CommentsModal> {
             context.read<NewsPageBloc>().add(GetCommentsUserNews(idNews: widget.newsId));
           }
 
+          if (state is LikeCommentSuccess) {
+            _safeSetState(() {
+              if (_likingCommentId != null) {
+                _likedByCommentId[_likingCommentId!] = true;
+                _sessionLikedByCommentId[_likingCommentId!] = true;
+              }
+              _likingCommentId = null;
+            });
+
+            context.read<NewsPageBloc>().add(NewsGetComments(id: widget.newsId));
+          }
+
+          if (state is UnlikeCommentSuccess) {
+            _safeSetState(() {
+              if (_likingCommentId != null) {
+                _likedByCommentId[_likingCommentId!] = false;
+                _sessionLikedByCommentId[_likingCommentId!] = false;
+              }
+              _likingCommentId = null;
+            });
+
+            context.read<NewsPageBloc>().add(NewsGetComments(id: widget.newsId));
+          }
+
           if (state is CommentError) {
             _safeSetState(() {
               _isSendingComment = false;
               _editingCommentId = null;
               _deletingCommentId = null;
+              _likingCommentId = null;
             });
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -683,7 +758,9 @@ class _CommentsModalState extends State<CommentsModal> {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {},
+                onTap: _likingCommentId == comment.id
+                  ? null
+                  : () => _likeComment(blocContext, comment),
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -701,11 +778,22 @@ class _CommentsModalState extends State<CommentsModal> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.favorite_outline,
-                        size: 16,
-                        color: primaryColor,
-                      ),
+                      _likingCommentId == comment.id
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFFAD2BEE),
+                              ),
+                            )
+                          : Icon(
+                              _isCommentLiked(comment)
+                                  ? Icons.favorite
+                                  : Icons.favorite_outline,
+                              size: 16,
+                              color: primaryColor,
+                            ),
                       const SizedBox(width: 6),
                       Text(
                         '${comment.likes ?? 0}',

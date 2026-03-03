@@ -3,6 +3,7 @@ class NewsCommentResponseDto {
   int? newsId;
   int? userId;
   int? likes;
+  bool? likedByMe;
   String? comment;
   String? createdAt;
   String? updatedAt;
@@ -14,6 +15,7 @@ class NewsCommentResponseDto {
     this.newsId,
     this.userId,
     this.likes,
+    this.likedByMe,
     this.comment,
     this.createdAt,
     this.updatedAt,
@@ -26,6 +28,12 @@ class NewsCommentResponseDto {
     newsId = json['news_id'];
     userId = json['user_id'];
     likes = json['likes'];
+    likedByMe =
+      (json['liked_by_me'] ??
+          json['is_liked'] ??
+          json['likedByMe'] ??
+          json['has_liked'])
+        as bool?;
     comment = json['comment'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -45,6 +53,7 @@ class NewsCommentResponseDto {
     data['news_id'] = this.newsId;
     data['user_id'] = this.userId;
     data['likes'] = this.likes;
+    data['liked_by_me'] = this.likedByMe;
     data['comment'] = this.comment;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;

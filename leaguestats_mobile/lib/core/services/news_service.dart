@@ -4,7 +4,6 @@ import 'package:leaguestats_mobile/core/interfaces/news_interface.dart';
 import 'package:http/http.dart' as http;
 import 'package:leaguestats_mobile/core/models/news/comment_request_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
-import 'package:leaguestats_mobile/core/models/news/news_list_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/storage_service.dart';
 
@@ -169,19 +168,53 @@ class NewsService implements NewsInterface {
         'Authorization': 'Bearer $token',
       },
     );
-    try{
-      if(response.statusCode>=200 && response.statusCode<300){
-      }else{
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+      } else {
         throw Exception(response.body);
       }
-    }catch(e){
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
-  
-  // @override
-  // Future<void> likeComment(int idNews) async{
-  //   var token = await storage_service.getToken();
-  //   var response = await http.post(Uri.parse('$_apiUrl/'))
-  // }
+
+  @override
+  Future<void> likeComment(int idNews) async {
+    var token = await storage_service.getToken();
+    var response = await http.post(
+      Uri.parse('$_apiUrl/news-comments/$idNews/like'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<void> unlikeComment(int idNews) async {
+    var token = await storage_service.getToken();
+    var response = await http.post(
+      Uri.parse('$_apiUrl/news-comments/$idNews/unlike'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }
