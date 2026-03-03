@@ -4,6 +4,31 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
 
+String _formatTimeAgo(String? dateString) {
+  if (dateString == null || dateString.isEmpty) return 'Hace poco';
+  
+  try {
+    final dateTime = DateTime.parse(dateString);
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inSeconds < 60) {
+      return 'Ahora mismo';
+    } else if (difference.inMinutes < 60) {
+      return 'Hace ${difference.inMinutes}m';
+    } else if (difference.inHours < 24) {
+      return 'Hace ${difference.inHours}h';
+    } else if (difference.inDays < 7) {
+      return 'Hace ${difference.inDays}d';
+    } else {
+      final weeks = (difference.inDays / 7).floor();
+      return 'Hace ${weeks}w';
+    }
+  } catch (e) {
+    return dateString;
+  }
+}
+
 class CommentsModal extends StatelessWidget {
   final int newsId;
 
@@ -34,14 +59,14 @@ class CommentsModal extends StatelessWidget {
           children: [
             // Encabezado del Modal
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 16.0),
               child: Column(
                 children: [
                   Container(
                     height: 4,
                     width: 40,
                     decoration: BoxDecoration(
-                      color: textSecondary.withOpacity(0.3),
+                      color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -53,13 +78,27 @@ class CommentsModal extends StatelessWidget {
                         'Comentarios',
                         style: GoogleFonts.splineSans(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1A1A),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.close, 
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -69,7 +108,8 @@ class CommentsModal extends StatelessWidget {
             // Divider
             Container(
               height: 1,
-              color: textSecondary.withOpacity(0.1),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              color: Colors.white.withOpacity(0.1),
             ),
             // Lista de Comentarios
             Expanded(
@@ -108,7 +148,7 @@ class CommentsModal extends StatelessWidget {
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       itemCount: comments.length,
                       itemBuilder: (context, index) {
                         final comment = comments[index];
@@ -137,75 +177,122 @@ class CommentsModal extends StatelessWidget {
     Color textSecondary,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Encabezado del comentario (usuario y fecha)
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: primaryColor,
-                child: const Icon(Icons.person, size: 18, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      comment.userProfile?.username ?? 'Usuario Anónimo',
-                      style: GoogleFonts.splineSans(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      comment.createdAt ?? 'Hace poco',
-                      style: GoogleFonts.merriweather(
-                        color: textSecondary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: primaryColor.withOpacity(0.1),
+            width: 1,
           ),
-          const SizedBox(height: 12),
-          // Texto del comentario
-          Text(
-            comment.comment ?? '',
-            style: GoogleFonts.merriweather(
-              color: Colors.white,
-              fontSize: 14,
-              height: 1.5,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
-          const SizedBox(height: 8),
-          // Acciones (me gusta)
-          Row(
-            children: [
-              Icon(Icons.thumb_up_off_alt,
-                  size: 16, color: textSecondary.withOpacity(0.7)),
-              const SizedBox(width: 4),
-              Text(
-                '${comment.likes ?? 0}',
-                style: GoogleFonts.merriweather(
-                  color: textSecondary,
-                  fontSize: 12,
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Encabezado del comentario (usuario y fecha)
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: const Icon(Icons.person, size: 20, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        comment.userProfile?.username ?? 'Usuario Anónimo',
+                        style: GoogleFonts.splineSans(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _formatTimeAgo(comment.createdAt),
+                        style: GoogleFonts.merriweather(
+                          color: textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            // Texto del comentario
+            Text(
+              comment.comment ?? '',
+              style: GoogleFonts.merriweather(
+                color: Colors.white,
+                fontSize: 15,
+                height: 1.6,
+              ),
+            ),
+            const SizedBox(height: 14),
+            // Botón Me Gusta mejorado
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: primaryColor.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.favorite_outline,
+                        size: 16,
+                        color: primaryColor,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${comment.likes ?? 0}',
+                        style: GoogleFonts.splineSans(
+                          color: primaryColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Divider(
-            color: textSecondary.withOpacity(0.1),
-            height: 1,
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

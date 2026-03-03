@@ -5,6 +5,31 @@ import 'package:leaguestats_mobile/core/services/news_service.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
 import 'package:leaguestats_mobile/features/news/ui/comments_modal.dart';
 
+String _formatTimeAgo(String? dateString) {
+  if (dateString == null || dateString.isEmpty) return 'Hace poco';
+  
+  try {
+    final dateTime = DateTime.parse(dateString);
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inSeconds < 60) {
+      return 'Ahora mismo';
+    } else if (difference.inMinutes < 60) {
+      return 'Hace ${difference.inMinutes}m';
+    } else if (difference.inHours < 24) {
+      return 'Hace ${difference.inHours}h';
+    } else if (difference.inDays < 7) {
+      return 'Hace ${difference.inDays}d';
+    } else {
+      final weeks = (difference.inDays / 7).floor();
+      return 'Hace ${weeks}w';
+    }
+  } catch (e) {
+    return dateString;
+  }
+}
+
 class NewsDetailPage extends StatelessWidget {
   final int newsId;
 
@@ -173,7 +198,7 @@ class NewsDetailPage extends StatelessWidget {
               ),
             ),
             Text(
-              news.createdAt, // Fecha real
+              _formatTimeAgo(news.createdAt),
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
@@ -202,31 +227,93 @@ class NewsDetailPage extends StatelessWidget {
       left: 0,
       right: 0,
       child: Container(
-        padding: const EdgeInsets.all(20),
-        color: const Color(0xFF121212).withOpacity(0.95),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.thumb_up_off_alt, color: Colors.grey),
-                SizedBox(width: 8),
-                Text('Me gusta', style: TextStyle(color: Colors.grey)),
-              ],
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF121212).withOpacity(0.98),
+          border: Border(
+            top: BorderSide(
+              color: primary.withOpacity(0.2),
+              width: 0.5,
             ),
-            ElevatedButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => CommentsModal(
-                    newsId: newsId,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            // Botón Comentarios mejorado
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: primary.withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: primary),
-              child: const Text('Comentarios'),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => CommentsModal(
+                        newsId: newsId,
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          primary,
+                          primary.withOpacity(0.85),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.chat_bubble_outline,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Comentarios',
+                          style: GoogleFonts.splineSans(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
