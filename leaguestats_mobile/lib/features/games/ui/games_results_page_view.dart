@@ -3,8 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/core/models/games/game_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/games_service.dart';
+import 'package:leaguestats_mobile/core/services/league_service.dart';
+import 'package:leaguestats_mobile/core/services/player_service.dart';
 import 'package:leaguestats_mobile/features/games/bloc/games_page_bloc.dart';
+import 'package:leaguestats_mobile/features/games/ui/game_detail_page_view.dart';
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
+import 'package:leaguestats_mobile/features/players/bloc/player_page_bloc.dart'
+  as player_bloc;
 
 class GamesResultsPageView extends StatefulWidget {
   const GamesResultsPageView({super.key});
@@ -15,6 +20,8 @@ class GamesResultsPageView extends StatefulWidget {
 
 class _GamesResultsPageViewState extends State<GamesResultsPageView> {
   late final GamesPageBloc _gamesBloc;
+  final LeagueService _leagueService = LeagueService();
+  final Map<int, Future<String>> _leagueNameFutures = {};
 
   @override
   void initState() {
@@ -36,7 +43,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
         backgroundColor: const Color(0xFF0F0F11),
         elevation: 0,
         title: Text(
-          'Resultados',
+          'Partidas',
           style: GoogleFonts.inter(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -76,11 +83,43 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
                 );
               }
 
-              return ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                itemCount: state.dto.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 14),
-                itemBuilder: (context, index) => _buildGameCard(state.dto[index]),
+              final games = state.dto;
+              final liveCount = games.where((game) => game.isActive == 1).length;
+
+              return Column(
+                children: [
+                  _buildOverviewCard(
+                    totalGames: games.length,
+                    liveGames: liveCount,
+                    finishedGames: games.length - liveCount,
+                  ),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _gamesBloc.add(GetAllEvent());
+                        await Future<void>.delayed(const Duration(milliseconds: 550));
+                      },
+                      color: const Color(0xFF9333EA),
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                        itemCount: games.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 14),
+                        itemBuilder: (context, index) {
+                          final game = games[index];
+                          return FutureBuilder<String>(
+                            future: _getLeagueNameFuture(game.leagueId),
+                            builder: (context, snapshot) {
+                              final leagueLabel = snapshot.data ??
+                                  (game.leagueId != null ? 'Liga #${game.leagueId}' : 'Liga');
+                              return _buildGameCard(game, leagueLabel);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               );
             }
 
@@ -91,7 +130,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
     );
   }
 
-  Widget _buildGameCard(GameResponseDto game) {
+  Widget _buildGameCard(GameResponseDto game, String leagueLabel) {
     final homeName = game.homeTeam?.name ?? 'Equipo local';
     final awayName = game.awayTeam?.name ?? 'Equipo visitante';
     final homeLogo = game.homeTeam?.logo ?? '';
@@ -103,16 +142,18 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
       playedMatches: playedMatches,
       maxGames: game.maxGames,
     );
-    final leagueLabel = game.leagueId != null ? 'Liga #${game.leagueId}' : 'Liga';
     final statusLabel = game.isActive == 1 ? 'EN JUEGO' : 'FINALIZADO';
     final statusBaseColor =
         game.isActive == 1 ? const Color(0xFFF59E0B) : const Color(0xFF10B981);
+    final topGradient = game.isActive == 1
+        ? const [Color(0xFF23183B), Color(0xFF151927)]
+        : const [Color(0xFF171B24), Color(0xFF11141B)];
 
-    return Container(
+    final cardContent = Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF171B24), Color(0xFF11141B)],
+        gradient: LinearGradient(
+          colors: topGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -135,6 +176,12 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
               const SizedBox(width: 8),
               _buildMetaChip(boLabel),
               const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: Colors.white.withOpacity(0.45),
+              ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
@@ -153,6 +200,8 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+          _buildMvpSection(game.mvpId),
           const SizedBox(height: 14),
           Row(
             children: [
@@ -192,6 +241,208 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
           ),
         ],
       ),
+    );
+
+    if (game.id == null) {
+      return cardContent;
+    }
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => GameDetailPageView(gameId: game.id!),
+          ),
+        );
+      },
+      child: cardContent,
+    );
+  }
+
+  Widget _buildMvpSection(int? mvpId) {
+    if (mvpId == null) {
+      return Text(
+        'MVP: -',
+        style: GoogleFonts.inter(
+          color: const Color(0xFF9CA3AF),
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+
+    return BlocProvider(
+      create: (_) => player_bloc.PlayerPageBloc(PlayerService())
+        ..add(player_bloc.GetByIdEvent(id: mvpId)),
+      child: BlocBuilder<player_bloc.PlayerPageBloc, player_bloc.PlayerPageState>(
+        builder: (context, state) {
+          if (state is player_bloc.PlayerPageSuccess) {
+            final player = state.dto;
+            final playerName = (player.name ?? '').trim().isEmpty
+                ? 'Jugador #$mvpId'
+                : player.name!;
+
+            return Row(
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D1117),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  child: DynamicNetworkImage(
+                    url: player.photo ?? '',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'MVP: $playerName',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFEAB308),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            );
+          }
+
+          if (state is player_bloc.PlayerPageError) {
+            return Text(
+              'MVP: Jugador #$mvpId',
+              style: GoogleFonts.inter(
+                color: const Color(0xFF9CA3AF),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            );
+          }
+
+          return Row(
+            children: [
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFFEAB308),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Cargando MVP...',
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF9CA3AF),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildOverviewCard({
+    required int totalGames,
+    required int liveGames,
+    required int finishedGames,
+  }) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1B1F2B), Color(0xFF12141B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildOverviewItem(
+              label: 'TOTAL',
+              value: '$totalGames',
+              color: const Color(0xFFE5E7EB),
+            ),
+          ),
+          Expanded(
+            child: _buildOverviewItem(
+              label: 'EN VIVO',
+              value: '$liveGames',
+              color: const Color(0xFFF59E0B),
+            ),
+          ),
+          Expanded(
+            child: _buildOverviewItem(
+              label: 'FINAL',
+              value: '$finishedGames',
+              color: const Color(0xFF10B981),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverviewItem({
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.inter(
+            color: color,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            color: const Color(0xFF9CA3AF),
+            fontWeight: FontWeight.w600,
+            fontSize: 10,
+            letterSpacing: 0.6,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<String> _getLeagueNameFuture(int? leagueId) {
+    if (leagueId == null) return Future.value('Liga');
+
+    return _leagueNameFutures.putIfAbsent(
+      leagueId,
+      () async {
+        try {
+          final league = await _leagueService.getById(leagueId);
+          final name = (league.name ?? '').trim();
+          if (name.isNotEmpty) {
+            return name;
+          }
+          return 'Liga #$leagueId';
+        } catch (_) {
+          return 'Liga #$leagueId';
+        }
+      },
     );
   }
 

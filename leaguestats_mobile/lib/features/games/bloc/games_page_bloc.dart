@@ -18,5 +18,16 @@ class GamesPageBloc extends Bloc<GamesPageEvent, GamesPageState> {
         emit(GamesPageError(message: e.toString()));
       }
     });
+    on<GetByIdEvent>((event, emit) async{
+      emit(GamesPageLoading());
+
+      try{
+        var game = await gameService.getBydId(event.id);
+        emit(GameSinglePageSuccess(dto: game));
+      }catch(e){
+        emit(GamesPageError(message: e.toString()));
+      }
+
+    },);
   }
 }
