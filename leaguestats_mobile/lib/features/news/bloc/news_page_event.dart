@@ -10,3 +10,9 @@ final class NewsGetById extends NewsPageEvent {
 
   NewsGetById({required this.id});
 }
+
+final class NewsGetComments extends NewsPageEvent{
+  final int id;
+
+  NewsGetComments({required this.id});
+}

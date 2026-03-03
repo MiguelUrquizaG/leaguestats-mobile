@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_list_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
@@ -27,6 +28,16 @@ class NewsPageBloc extends Bloc<NewsPageEvent, NewsPageState> {
         emit(NewsPageSingleSuccess(dto: news));
       } catch (e) {
         emit(NewsPageError(message: e.toString()));
+      }
+    });
+    on<NewsGetComments>((event, emit) async {
+      emit(NewsCommentsLoading());
+
+      try {
+        var comments = await newsService.getNewsComments(event.id);
+        emit(NewsCommentsSuccess(dto: comments));
+      } catch (e) {
+        emit(NewsCommentsPageError(message: e.toString()));
       }
     });
   }

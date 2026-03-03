@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
+import 'package:leaguestats_mobile/features/news/ui/comments_modal.dart';
 
 class NewsDetailPage extends StatelessWidget {
   final int newsId;
@@ -89,7 +90,7 @@ class NewsDetailPage extends StatelessWidget {
                     ),
                   ),
                   _buildTopNavigation(context),
-                  _buildBottomBar(primaryColor),
+                  _buildBottomBar(primaryColor, context),
                 ],
               );
             }
@@ -195,7 +196,7 @@ class NewsDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomBar(Color primary) {
+  Widget _buildBottomBar(Color primary, BuildContext context) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -214,7 +215,16 @@ class NewsDetailPage extends StatelessWidget {
               ],
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => CommentsModal(
+                    newsId: newsId,
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(backgroundColor: primary),
               child: const Text('Comentarios'),
             ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:leaguestats_mobile/core/interfaces/news_interface.dart';
 import 'package:http/http.dart' as http;
+import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_list_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/storage_service.dart';
@@ -47,9 +48,8 @@ class NewsService implements NewsInterface {
       Uri.parse("$_apiUrl/news/$id"),
       headers: {
         'Content-Type': 'application/json',
-        'Accept':'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
-        
       },
     );
     try {
@@ -60,6 +60,29 @@ class NewsService implements NewsInterface {
         throw Exception(response.body);
       }
     } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<List<NewsCommentResponseDto>> getNewsComments(int id) async {
+    var token = await storage_service.getToken();
+    var response = await http.get(
+      Uri.parse('$_apiUrl/news/$id/comments'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    try{
+      if(response.statusCode >=200 && response.statusCode<300){
+        var commentsList = NewsCommentResponseDto.fromJsonList(jsonDecode(response.body));
+        return commentsList;
+      }else{
+        throw Exception(response.body);
+      }
+    }catch(e){
       throw Exception(e.toString());
     }
   }
