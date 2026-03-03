@@ -11,8 +11,28 @@ final class NewsGetById extends NewsPageEvent {
   NewsGetById({required this.id});
 }
 
-final class NewsGetComments extends NewsPageEvent{
+final class NewsGetComments extends NewsPageEvent {
   final int id;
 
   NewsGetComments({required this.id});
+}
+
+final class NewsPostComment extends NewsPageEvent {
+  final CommentRequestDto dto;
+  final int idNews;
+
+  NewsPostComment({required this.dto, required this.idNews});
+}
+
+final class NewsEditComment extends NewsPageEvent {
+  final CommentRequestDto dto;
+  final int idNews;
+
+  NewsEditComment({required this.dto, required this.idNews});
+}
+
+final class GetCommentsUserNews extends NewsPageEvent {
+  final int idNews;
+
+  GetCommentsUserNews({required this.idNews});
 }

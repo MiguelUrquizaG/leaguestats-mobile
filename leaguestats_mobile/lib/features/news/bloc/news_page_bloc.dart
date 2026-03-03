@@ -1,9 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:leaguestats_mobile/core/models/news/comment_request_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
-import 'package:leaguestats_mobile/core/models/news/news_list_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
-import 'package:leaguestats_mobile/core/services/storage_service.dart';
 import 'package:meta/meta.dart';
 
 part 'news_page_event.dart';
@@ -38,6 +37,35 @@ class NewsPageBloc extends Bloc<NewsPageEvent, NewsPageState> {
         emit(NewsCommentsSuccess(dto: comments));
       } catch (e) {
         emit(NewsCommentsPageError(message: e.toString()));
+      }
+    });
+    on<NewsPostComment>((event, emit) async {
+      emit(CommentLoading());
+
+      try {
+        await newsService.postComment(event.dto, event.idNews);
+        emit(CommentSuccess());
+      } catch (e) {
+        emit(CommentError(message: e.toString()));
+      }
+    });
+
+    on<NewsEditComment>((event, emit) async {
+      emit(CommentLoading());
+      try {
+        await newsService.updateComment(event.dto, event.idNews);
+        emit(CommentSuccess());
+      } catch (e) {
+        emit(CommentError(message: e.toString()));
+      }
+    });
+    on<GetCommentsUserNews>((event, emit) async {
+      emit(CommentLoading());
+      try {
+        var response = await newsService.findCommentsUserNew(event.idNews);
+        emit(GetCommentsUserNewsSuccess(dto: response));
+      } catch (e) {
+        emit(NewsPageError(message: e.toString()));
       }
     });
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:leaguestats_mobile/core/models/news/comment_request_dto.dart';
+import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/news_service.dart';
 import 'package:leaguestats_mobile/features/news/bloc/news_page_bloc.dart';
 
@@ -29,13 +31,134 @@ String _formatTimeAgo(String? dateString) {
   }
 }
 
-class CommentsModal extends StatelessWidget {
+class CommentsModal extends StatefulWidget {
   final int newsId;
 
   const CommentsModal({
     super.key,
     required this.newsId,
   });
+
+  @override
+  State<CommentsModal> createState() => _CommentsModalState();
+}
+
+class _CommentsModalState extends State<CommentsModal> {
+  final TextEditingController _commentController = TextEditingController();
+  List<NewsCommentResponseDto> _comments = [];
+  final Set<int> _editableCommentIds = <int>{};
+  bool _isFetchingComments = true;
+  bool _isSendingComment = false;
+  int? _editingCommentId;
+
+  void _safeSetState(VoidCallback fn) {
+    if (!mounted) return;
+    setState(fn);
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  void _sendComment(BuildContext blocContext) {
+    final commentText = _commentController.text.trim();
+    if (commentText.isEmpty || _isSendingComment) {
+      return;
+    }
+
+    setState(() {
+      _isSendingComment = true;
+      _editingCommentId = null;
+    });
+
+    blocContext.read<NewsPageBloc>().add(
+      NewsPostComment(
+        dto: CommentRequestDto(comment: commentText),
+        idNews: widget.newsId,
+      ),
+    );
+  }
+
+  void _editComment(
+    BuildContext blocContext,
+    NewsCommentResponseDto comment,
+    String updatedComment,
+  ) {
+    final commentId = comment.id;
+    if (commentId == null || _isSendingComment) {
+      return;
+    }
+
+    setState(() {
+      _isSendingComment = true;
+      _editingCommentId = commentId;
+    });
+
+    blocContext.read<NewsPageBloc>().add(
+      NewsEditComment(
+        dto: CommentRequestDto(comment: updatedComment),
+        idNews: commentId,
+      ),
+    );
+  }
+
+  Future<void> _showEditDialog(
+    BuildContext blocContext,
+    NewsCommentResponseDto comment,
+  ) async {
+    final controller = TextEditingController(text: comment.comment ?? '');
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: Text(
+            'Editar comentario',
+            style: GoogleFonts.splineSans(color: Colors.white),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: 4,
+            minLines: 2,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: 'Actualiza tu comentario...',
+              hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0x33FFFFFF)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFFAD2BEE)),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final updatedText = controller.text.trim();
+                if (updatedText.isEmpty) {
+                  return;
+                }
+                Navigator.of(dialogContext).pop();
+                _editComment(blocContext, comment, updatedText);
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,136 +168,303 @@ class CommentsModal extends StatelessWidget {
 
     return BlocProvider(
       create: (context) =>
-          NewsPageBloc(NewsService())..add(NewsGetComments(id: newsId)),
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+          NewsPageBloc(NewsService())
+            ..add(NewsGetComments(id: widget.newsId))
+            ..add(GetCommentsUserNews(idNews: widget.newsId)),
+      child: BlocConsumer<NewsPageBloc, NewsPageState>(
+        listener: (context, state) {
+          if (!mounted) return;
+
+          if (state is NewsCommentsLoading && _comments.isEmpty) {
+            _safeSetState(() {
+              _isFetchingComments = true;
+            });
+          }
+
+          if (state is NewsCommentsSuccess) {
+            _safeSetState(() {
+              _comments = state.dto;
+              _isFetchingComments = false;
+            });
+          }
+
+          if (state is CommentSuccess) {
+            final wasEditing = _editingCommentId != null;
+            _safeSetState(() {
+              _isSendingComment = false;
+              _editingCommentId = null;
+            });
+
+            if (!wasEditing) {
+              _commentController.clear();
+            }
+
+            FocusScope.of(context).unfocus();
+            context.read<NewsPageBloc>().add(NewsGetComments(id: widget.newsId));
+            context.read<NewsPageBloc>().add(GetCommentsUserNews(idNews: widget.newsId));
+          }
+
+          if (state is CommentError) {
+            _safeSetState(() {
+              _isSendingComment = false;
+              _editingCommentId = null;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+
+          if (state is NewsCommentsPageError) {
+            _safeSetState(() {
+              _isFetchingComments = false;
+            });
+          }
+
+          if (state is GetCommentsUserNewsSuccess) {
+            _safeSetState(() {
+              _editableCommentIds
+                ..clear()
+                ..addAll(
+                  state.dto
+                      .map((comment) => comment.id)
+                      .whereType<int>(),
+                );
+            });
+          }
+        },
+        builder: (context, state) => AnimatedPadding(
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-        ),
-        child: Column(
-          children: [
-            // Encabezado del Modal
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 16.0),
-              child: Column(
-                children: [
-                  Container(
-                    height: 4,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.75,
+            decoration: const BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Encabezado del Modal
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 16.0),
+                  child: Column(
                     children: [
-                      Text(
-                        'Comentarios',
-                        style: GoogleFonts.splineSans(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        height: 4,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.close, 
-                            color: Colors.white,
-                            size: 22,
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Comentarios',
+                            style: GoogleFonts.splineSans(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          onPressed: () => Navigator.pop(context),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1A1A1A),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.close,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(
+                                minWidth: 40,
+                                minHeight: 40,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            // Divider
-            Container(
-              height: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              color: Colors.white.withOpacity(0.1),
-            ),
-            // Lista de Comentarios
-            Expanded(
-              child: BlocBuilder<NewsPageBloc, NewsPageState>(
-                builder: (context, state) {
-                  if (state is NewsCommentsLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: primaryColor,
+                ),
+                // Divider
+                Container(
+                  height: 1,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  color: Colors.white.withOpacity(0.1),
+                ),
+                // Lista de Comentarios
+                Expanded(
+                  child: Builder(
+                    builder: (context) {
+                      if (_isFetchingComments) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: primaryColor,
+                          ),
+                        );
+                      }
+
+                      if (state is NewsCommentsPageError && _comments.isEmpty) {
+                        return Center(
+                          child: Text(
+                            state.message,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      if (_comments.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No hay comentarios aún',
+                            style: GoogleFonts.merriweather(
+                              color: textSecondary,
+                              fontSize: 16,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        itemCount: _comments.length,
+                        itemBuilder: (context, index) {
+                          final comment = _comments[index];
+                          final canEdit =
+                              comment.id != null && _editableCommentIds.contains(comment.id);
+                          return _buildCommentCard(
+                            context,
+                            comment,
+                            primaryColor,
+                            textSecondary,
+                            canEdit: canEdit,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF121212),
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.white.withOpacity(0.08),
+                          width: 1,
+                        ),
                       ),
-                    );
-                  }
-
-                  if (state is NewsCommentsPageError) {
-                    return Center(
-                      child: Text(
-                        state.message,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    );
-                  }
-
-                  if (state is NewsCommentsSuccess) {
-                    final comments = state.dto;
-
-                    if (comments.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'No hay comentarios aún',
-                          style: GoogleFonts.merriweather(
-                            color: textSecondary,
-                            fontSize: 16,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _commentController,
+                            style: const TextStyle(color: Colors.white),
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) => _sendComment(context),
+                            decoration: InputDecoration(
+                              hintText: 'Escribe un comentario...',
+                              hintStyle: TextStyle(
+                                color: textSecondary.withOpacity(0.9),
+                              ),
+                              filled: true,
+                              fillColor: const Color(0xFF1A1A1A),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.white.withOpacity(0.08),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.white.withOpacity(0.08),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: primaryColor,
+                                  width: 1,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                            ),
                           ),
                         ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      itemCount: comments.length,
-                      itemBuilder: (context, index) {
-                        final comment = comments[index];
-                        return _buildCommentCard(
-                          comment,
-                          primaryColor,
-                          textSecondary,
-                        );
-                      },
-                    );
-                  }
-
-                  return const SizedBox();
-                },
-              ),
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            onPressed: _isSendingComment
+                                ? null
+                                : () => _sendComment(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor: primaryColor.withOpacity(0.5),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                            child: _isSendingComment
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Enviar',
+                                    style: GoogleFonts.splineSans(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCommentCard(
-    dynamic comment,
+    BuildContext blocContext,
+    NewsCommentResponseDto comment,
     Color primaryColor,
     Color textSecondary,
+    {required bool canEdit}
   ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -237,6 +527,18 @@ class CommentsModal extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (canEdit)
+                  IconButton(
+                    onPressed: _isSendingComment
+                        ? null
+                        : () => _showEditDialog(blocContext, comment),
+                    icon: Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                      color: primaryColor,
+                    ),
+                    tooltip: 'Editar comentario',
+                  ),
               ],
             ),
             const SizedBox(height: 14),

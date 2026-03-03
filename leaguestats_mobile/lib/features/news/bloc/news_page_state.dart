@@ -7,12 +7,20 @@ final class NewsPageInitial extends NewsPageState {}
 
 final class NewsPageLoading extends NewsPageState {}
 
-final class NewsCommentsLoading extends NewsPageState{}
+final class NewsCommentsLoading extends NewsPageState {}
+
+final class CommentLoading extends NewsPageState {}
 
 final class NewsPageSuccess extends NewsPageState {
   final List<NewsResponseDto> dto;
 
   NewsPageSuccess({required this.dto});
+}
+
+final class GetCommentsUserNewsSuccess extends NewsPageState {
+  final List<NewsCommentResponseDto> dto;
+
+  GetCommentsUserNewsSuccess({required this.dto});
 }
 
 final class NewsPageSingleSuccess extends NewsPageState {
@@ -33,8 +41,17 @@ final class NewsPageError extends NewsPageState {
   NewsPageError({required this.message});
 }
 
-final class NewsCommentsPageError extends NewsPageState{
+final class CommentSuccess extends NewsPageState {}
+
+final class NewsCommentsPageError extends NewsPageState {
   final String message;
 
   NewsCommentsPageError({required this.message});
 }
+
+final class CommentError extends NewsPageState {
+  final String message;
+
+  CommentError({required this.message});
+}
+

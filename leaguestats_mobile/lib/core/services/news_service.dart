@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:leaguestats_mobile/core/interfaces/news_interface.dart';
 import 'package:http/http.dart' as http;
+import 'package:leaguestats_mobile/core/models/news/comment_request_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_comment_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_list_response_dto.dart';
 import 'package:leaguestats_mobile/core/models/news/news_response_dto.dart';
@@ -75,10 +76,79 @@ class NewsService implements NewsInterface {
       },
     );
 
-    try{
-      if(response.statusCode >=200 && response.statusCode<300){
-        var commentsList = NewsCommentResponseDto.fromJsonList(jsonDecode(response.body));
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        var commentsList = NewsCommentResponseDto.fromJsonList(
+          jsonDecode(response.body),
+        );
         return commentsList;
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<void> postComment(CommentRequestDto dto, int idNews) async {
+    var token = await storage_service.getToken();
+    var response = await http.post(
+      Uri.parse('$_apiUrl/news/$idNews/comments'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(dto.toJson()),
+    );
+
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<void> updateComment(CommentRequestDto dto, int idNews) async {
+    var token = await storage_service.getToken();
+    var response = await http.put(
+      Uri.parse('$_apiUrl/news-comments/$idNews'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(dto.toJson()),
+    );
+
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+    //Comentarios del usuario en esa noticia. /news/{newsId}/comments
+  }
+
+  @override
+  Future<List<NewsCommentResponseDto>> findCommentsUserNew(int idNews) async {
+    var token = await storage_service.getToken();
+    var response = await http.get(
+      Uri.parse('$_apiUrl/news/$idNews/comments'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    try{
+      if(response.statusCode>=200 && response.statusCode<300){
+        var listComments = NewsCommentResponseDto.fromJsonList(jsonDecode(response.body));
+        return listComments;
       }else{
         throw Exception(response.body);
       }
