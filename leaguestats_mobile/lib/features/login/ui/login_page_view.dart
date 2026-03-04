@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:leaguestats_mobile/features/login/bloc/login_page_bloc.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/storage_service.dart';
@@ -21,15 +22,21 @@ class _LoginPageViewState extends State<LoginPageView> {
 
   @override
   Widget build(BuildContext context) {
-    const Color backgroundDark = Color(0xFF0F1115);
-    const Color primaryColor = Color(0xFF5D12D2);
-    const Color inputBg = Color(0xFF1E2128);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+      ? const Color(0xFF0F1115)
+      : const Color(0xFFF3F4F6);
+    final surfaceColor = isDark ? const Color(0xFF1E2128) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF111827);
+    final subtitleColor = isDark
+      ? const Color(0xFF9CA3AF)
+      : const Color(0xFF6B7280);
+    const Color primaryColor = Color(0xFF8B00FF);
 
     const String logoSvg = '''
 <svg fill="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-<path d="M50 15L85 50L50 85L15 50L50 15Z" stroke="white" stroke-linejoin="round" stroke-width="6"></path>
-<path d="M50 35L65 50L50 65L35 50L50 35Z" fill="white"></path>
-<path d="M50 28L72 50L50 72L28 50L50 28Z" stroke="white" stroke-width="2"></path>
+  <path d="M50 20L20 50L50 80L80 50L50 20Z" stroke="black" stroke-linejoin="round" stroke-width="8"></path>
+  <path d="M50 35L35 50L50 65L65 50L50 35Z" fill="black"></path>
 </svg>
 ''';
 
@@ -53,106 +60,125 @@ class _LoginPageViewState extends State<LoginPageView> {
           }
         },
         child: Scaffold(
-          backgroundColor: backgroundDark,
-          resizeToAvoidBottomInset: false,
+          backgroundColor: backgroundColor,
           body: Stack(
             children: [
-              // 1. IMAGEN DE FONDO
-              Positioned(
-                top: 0,
-                left: -500,
-                // Ajustamos la altura para que cubra más área pero se funda antes de los botones
-                height: MediaQuery.of(context).size.height * 0.75,
-                child: Image.network(
-                  'https://4kwallpapers.com/images/walls/thumbs_3t/8373.jpg',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                ),
-              ),
-
-              // 2. GRADIENTE DE TRANSICIÓN MEJORADO
-              Positioned.fill(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      // Puntos de parada estratégicos para evitar cortes raros
-                      stops: [0.0, 0.45, 0.85, 1.0],
-                      colors: [
-                        Colors
-                            .black54, // Oscurece un poco arriba para el icono de atrás
-                        Colors.transparent, // Deja la imagen clara en el centro
-                        backgroundDark, // Fundido suave sobre los inputs
-                        backgroundDark, // Fondo sólido al final
+              Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.50,
+                    width: double.infinity,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          'https://giffiles.alphacoders.com/220/220389.gif',
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(color: Colors.black),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(color: Colors.grey[900]);
+                          },
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                backgroundColor.withValues(alpha: 0.0),
+                                backgroundColor.withValues(alpha: 0.45),
+                                backgroundColor.withValues(alpha: 1.0),
+                              ],
+                              stops: const [0.0, 0.55, 0.92],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 42,
+                          left: 10,
+                          child: IconButton(
+                            onPressed: () {
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              } else {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/register',
+                                );
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 16,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: SizedBox(
+                              width: 80,
+                              height: 80,
+                              child: SvgPicture.string(
+                                logoSvg,
+                                width: 80,
+                                height: 80,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ),
-              ),
-
-              // 3. CONTENIDO PRINCIPAL
-              SafeArea(
-                child: Column(
-                  children: [
-                    // Icono de volver
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 8),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_ios_new,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/register');
-                          },
-                        ),
-                      ),
-                    ),
-
-                    // Logo centrado con resplandor
-                    Expanded(
-                      child: Center(
-                        child: Container(
-                          width: 90,
-                          height: 90,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.15),
-                                blurRadius: 50,
-                                spreadRadius: 5,
-                              ),
-                            ],
-                          ),
-                          child: SvgPicture.string(logoSvg),
-                        ),
-                      ),
-                    ),
-
-                    // Sección inferior (Formulario y Botón)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _buildLabel('Email'),
+                          Text(
+                            'LeagueStats',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Inicia sesión para seguir tus ligas, equipos y partidas favoritas.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: subtitleColor,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          _buildLabel('Email', subtitleColor),
                           const SizedBox(height: 8),
                           TextField(
                             controller: _emailController,
-                            style: const TextStyle(color: Colors.white),
+                            style: GoogleFonts.inter(
+                              color: textColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                             decoration: InputDecoration(
-                              hintText: "Enter your email",
-                              hintStyle: const TextStyle(
-                                color: Colors.white24,
-                                fontSize: 15,
+                              hintText: 'tu@email.com',
+                              hintStyle: GoogleFonts.inter(
+                                color: subtitleColor,
+                                fontSize: 14,
                               ),
                               filled: true,
-                              fillColor: inputBg,
+                              fillColor: surfaceColor,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 18,
@@ -163,23 +189,24 @@ class _LoginPageViewState extends State<LoginPageView> {
                               ),
                             ),
                           ),
-
-                          const SizedBox(height: 20),
-
-                          _buildLabel('Contraseña'),
+                          const SizedBox(height: 16),
+                          _buildLabel('Contraseña', subtitleColor),
                           const SizedBox(height: 8),
                           TextField(
                             controller: _passwordController,
                             obscureText: !_showPassword,
-                            style: const TextStyle(color: Colors.white),
+                            style: GoogleFonts.inter(
+                              color: textColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                             decoration: InputDecoration(
-                              hintText: "••••••••",
-                              hintStyle: const TextStyle(
-                                color: Colors.white24,
-                                fontSize: 15,
+                              hintText: '••••••••',
+                              hintStyle: GoogleFonts.inter(
+                                color: subtitleColor,
+                                fontSize: 14,
                               ),
                               filled: true,
-                              fillColor: inputBg,
+                              fillColor: surfaceColor,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 18,
@@ -193,7 +220,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                                   _showPassword
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: Colors.white24,
+                                  color: subtitleColor,
                                   size: 20,
                                 ),
                                 onPressed: () => setState(
@@ -202,126 +229,129 @@ class _LoginPageViewState extends State<LoginPageView> {
                               ),
                             ),
                           ),
-
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () {},
-                              child: const Text(
+                              child: Text(
                                 '¿Has olvidado tu contraseña?',
-                                style: TextStyle(
-                                  color: Colors.white30,
+                                style: GoogleFonts.inter(
+                                  color: subtitleColor,
                                   fontSize: 12,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ),
-
-                          const SizedBox(height: 12),
-
-                          // Botón con sombra de color para evitar el efecto plano
+                          const SizedBox(height: 10),
                           BlocBuilder<LoginPageBloc, LoginPageState>(
                             builder: (context, state) {
-                              return Container(
-                                height: 58,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: primaryColor.withOpacity(0.2),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: state is LoginPageLoading
-                                      ? null
-                                      : () {
-                                          final email = _emailController.text
-                                              .trim();
-                                          final password = _passwordController
-                                              .text
-                                              .trim();
-                                          if (email.isEmpty ||
-                                              password.isEmpty) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                  'Completa ambos campos',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),
+                              return ElevatedButton(
+                                onPressed: state is LoginPageLoading
+                                    ? null
+                                    : () {
+                                        final email = _emailController.text
+                                            .trim();
+                                        final password = _passwordController
+                                            .text
+                                            .trim();
+                                        if (email.isEmpty || password.isEmpty) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Completa ambos campos',
+                                                style: TextStyle(
+                                                  color: Colors.white,
                                                 ),
-                                                backgroundColor: Colors.red,
                                               ),
-                                            );
-                                            return;
-                                          }
-                                          context.read<LoginPageBloc>().add(
-                                            LoginEvent(
-                                              dto: LoginRequestDto(
-                                                email: email,
-                                                password: password,
-                                              ),
+                                              backgroundColor: Colors.red,
                                             ),
                                           );
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: primaryColor,
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                          return;
+                                        }
+                                        context.read<LoginPageBloc>().add(
+                                          LoginEvent(
+                                            dto: LoginRequestDto(
+                                              email: email,
+                                              password: password,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(double.infinity, 56),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: state is LoginPageLoading
-                                      ? const SizedBox(
-                                          height: 24,
-                                          width: 24,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : const Text(
-                                          'Iniciar Sesión',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                  elevation: 8,
+                                  shadowColor: primaryColor.withValues(
+                                    alpha: 0.5,
+                                  ),
                                 ),
+                                child: state is LoginPageLoading
+                                    ? const SizedBox(
+                                        height: 22,
+                                        width: 22,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Iniciar sesión',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                               );
                             },
                           ),
-
-                          // Espacio para el indicador de inicio de sistema
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 16),
+                          OutlinedButton(
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                context,
+                                '/register_real',
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 56),
+                              side: const BorderSide(color: primaryColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Crear cuenta',
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Container(
+                            width: 128,
+                            height: 6,
+                            margin: const EdgeInsets.symmetric(horizontal: 100),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-
-              // Indicador inferior (Home Indicator)
-              Positioned(
-                bottom: 10,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    width: 130,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -330,39 +360,13 @@ class _LoginPageViewState extends State<LoginPageView> {
     );
   }
 
-  // Helpers para limpieza de código
-  Widget _buildLabel(String text) => Text(
-    text,
-    style: const TextStyle(
-      color: Colors.white70,
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-    ),
-  );
-
-  Widget _buildInput(
-    String hint,
-    Color bg, {
-    bool isPass = false,
-    Widget? suffix,
-  }) {
-    return TextField(
-      obscureText: isPass,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white24, fontSize: 15),
-        filled: true,
-        fillColor: bg,
-        suffixIcon: suffix,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
+  Widget _buildLabel(String text, Color color) {
+    return Text(
+      text,
+      style: GoogleFonts.inter(
+        color: color,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
