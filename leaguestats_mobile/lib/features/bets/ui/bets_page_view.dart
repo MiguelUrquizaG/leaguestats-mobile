@@ -370,15 +370,7 @@ class _BetsPageViewState extends State<BetsPageView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).maybePop();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            color: Colors.white,
-            iconSize: 20,
-            tooltip: 'Volver',
-          ),
+          const SizedBox(width: 40),
           const Row(
             children: [
               Icon(Icons.signal_cellular_alt, color: Colors.white, size: 14),

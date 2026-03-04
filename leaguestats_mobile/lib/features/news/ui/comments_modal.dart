@@ -45,7 +45,8 @@ class CommentsModal extends StatefulWidget {
 }
 
 class _CommentsModalState extends State<CommentsModal> {
-  static final Map<int, bool> _sessionLikedByCommentId = <int, bool>{};
+  static final Map<String, bool> _sessionLikedByUserAndComment =
+      <String, bool>{};
 
   final TextEditingController _commentController = TextEditingController();
   final StorageService _storageService = StorageService();
@@ -91,11 +92,21 @@ class _CommentsModalState extends State<CommentsModal> {
       return _likedByCommentId[commentId] ?? false;
     }
 
-    if (commentId != null && _sessionLikedByCommentId.containsKey(commentId)) {
-      return _sessionLikedByCommentId[commentId] ?? false;
+    final key = _sessionLikeKey(commentId);
+    if (key != null && _sessionLikedByUserAndComment.containsKey(key)) {
+      return _sessionLikedByUserAndComment[key] ?? false;
     }
 
     return comment.likedByMe ?? false;
+  }
+
+  String? _sessionLikeKey(int? commentId) {
+    if (commentId == null) return null;
+
+    final currentEmail = _currentUserEmail?.trim().toLowerCase();
+    if (currentEmail == null || currentEmail.isEmpty) return null;
+
+    return '$currentEmail::$commentId';
   }
 
   @override
@@ -309,7 +320,8 @@ class _CommentsModalState extends State<CommentsModal> {
       create: (context) =>
           NewsPageBloc(NewsService())
             ..add(NewsGetComments(id: widget.newsId))
-            ..add(GetCommentsUserNews(idNews: widget.newsId)),
+            ..add(GetCommentsUserNews(idNews: widget.newsId))
+            ..add(GetLikedCommentsUserNews(idNews: widget.newsId)),
       child: BlocConsumer<NewsPageBloc, NewsPageState>(
         listener: (context, state) {
           if (!mounted) return;
@@ -328,7 +340,10 @@ class _CommentsModalState extends State<CommentsModal> {
                 final commentId = comment.id;
                 if (commentId != null && comment.likedByMe != null) {
                   _likedByCommentId[commentId] = comment.likedByMe!;
-                  _sessionLikedByCommentId[commentId] = comment.likedByMe!;
+                  final key = _sessionLikeKey(commentId);
+                  if (key != null) {
+                    _sessionLikedByUserAndComment[key] = comment.likedByMe!;
+                  }
                 }
               }
             });
@@ -366,24 +381,36 @@ class _CommentsModalState extends State<CommentsModal> {
             _safeSetState(() {
               if (_likingCommentId != null) {
                 _likedByCommentId[_likingCommentId!] = true;
-                _sessionLikedByCommentId[_likingCommentId!] = true;
+                final key = _sessionLikeKey(_likingCommentId);
+                if (key != null) {
+                  _sessionLikedByUserAndComment[key] = true;
+                }
               }
               _likingCommentId = null;
             });
 
             context.read<NewsPageBloc>().add(NewsGetComments(id: widget.newsId));
+            context.read<NewsPageBloc>().add(
+              GetLikedCommentsUserNews(idNews: widget.newsId),
+            );
           }
 
           if (state is UnlikeCommentSuccess) {
             _safeSetState(() {
               if (_likingCommentId != null) {
                 _likedByCommentId[_likingCommentId!] = false;
-                _sessionLikedByCommentId[_likingCommentId!] = false;
+                final key = _sessionLikeKey(_likingCommentId);
+                if (key != null) {
+                  _sessionLikedByUserAndComment[key] = false;
+                }
               }
               _likingCommentId = null;
             });
 
             context.read<NewsPageBloc>().add(NewsGetComments(id: widget.newsId));
+            context.read<NewsPageBloc>().add(
+              GetLikedCommentsUserNews(idNews: widget.newsId),
+            );
           }
 
           if (state is CommentError) {
@@ -408,6 +435,28 @@ class _CommentsModalState extends State<CommentsModal> {
           if (state is GetCommentsUserNewsSuccess) {
             _safeSetState(() {
               _userComments = state.dto;
+            });
+          }
+
+          if (state is GetLikedCommentsUserNewsSuccess) {
+            final likedIds = state.dto
+                .map((comment) => comment.id)
+                .whereType<int>()
+                .toSet();
+
+            _safeSetState(() {
+              for (final comment in _comments) {
+                final commentId = comment.id;
+                if (commentId == null) continue;
+
+                final isLiked = likedIds.contains(commentId);
+                _likedByCommentId[commentId] = isLiked;
+
+                final key = _sessionLikeKey(commentId);
+                if (key != null) {
+                  _sessionLikedByUserAndComment[key] = isLiked;
+                }
+              }
             });
           }
         },

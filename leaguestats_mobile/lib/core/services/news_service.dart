@@ -10,6 +10,24 @@ import 'package:leaguestats_mobile/core/services/storage_service.dart';
 class NewsService implements NewsInterface {
   final String _apiUrl = "http://10.0.2.2:8000/api";
   final StorageService storage_service = StorageService();
+
+  List<NewsCommentResponseDto> _parseCommentListResponse(dynamic decoded) {
+    if (decoded is List) {
+      return NewsCommentResponseDto.fromJsonList(decoded);
+    }
+
+    if (decoded is Map<String, dynamic>) {
+      final candidates = [decoded['data'], decoded['comments'], decoded['result']];
+
+      for (final candidate in candidates) {
+        if (candidate is List) {
+          return NewsCommentResponseDto.fromJsonList(candidate);
+        }
+      }
+    }
+
+    return <NewsCommentResponseDto>[];
+  }
   @override
   Future<List<NewsResponseDto>> getAll() async {
     print('SERVICIO');
@@ -77,9 +95,7 @@ class NewsService implements NewsInterface {
 
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        var commentsList = NewsCommentResponseDto.fromJsonList(
-          jsonDecode(response.body),
-        );
+        var commentsList = _parseCommentListResponse(jsonDecode(response.body));
         return commentsList;
       } else {
         throw Exception(response.body);
@@ -146,10 +162,36 @@ class NewsService implements NewsInterface {
     );
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        var listComments = NewsCommentResponseDto.fromJsonList(
-          jsonDecode(response.body),
-        );
+        var listComments = _parseCommentListResponse(jsonDecode(response.body));
         return listComments;
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<List<NewsCommentResponseDto>> findLikedByMe({int? idNews}) async {
+    var token = await storage_service.getToken();
+    var response = await http.get(
+      Uri.parse('$_apiUrl/news-comments/liked'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final list = _parseCommentListResponse(jsonDecode(response.body));
+        if (idNews == null) {
+          return list;
+        }
+
+        return list.where((comment) => comment.newsId == idNews).toList();
       } else {
         throw Exception(response.body);
       }

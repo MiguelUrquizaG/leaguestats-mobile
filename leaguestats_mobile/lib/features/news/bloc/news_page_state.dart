@@ -23,6 +23,12 @@ final class GetCommentsUserNewsSuccess extends NewsPageState {
   GetCommentsUserNewsSuccess({required this.dto});
 }
 
+final class GetLikedCommentsUserNewsSuccess extends NewsPageState {
+  final List<NewsCommentResponseDto> dto;
+
+  GetLikedCommentsUserNewsSuccess({required this.dto});
+}
+
 final class NewsPageSingleSuccess extends NewsPageState {
   final NewsResponseDto dto;
 

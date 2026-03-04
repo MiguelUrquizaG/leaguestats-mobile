@@ -3,10 +3,7 @@ import 'package:leaguestats_mobile/features/premiun/ui/premium_page.dart';
 import 'package:leaguestats_mobile/core/services/user_service.dart';
 import 'package:leaguestats_mobile/core/models/user/user_response_dto.dart';
 import 'package:leaguestats_mobile/features/profile/ui/profile_page_view.dart';
-import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
-import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
 import 'package:leaguestats_mobile/features/games/ui/games_results_page_view.dart';
-import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart';
 import 'package:leaguestats_mobile/features/leagues/ui/leagues_search_page_view.dart';
 
 class MenuComponent extends StatefulWidget {
@@ -120,26 +117,6 @@ class _MenuComponentState extends State<MenuComponent> {
                 const SizedBox(height: 24),
                 // Menu Items
                 _MenuItem(
-                  icon: Icons.newspaper,
-                  title: 'Noticias',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const NewsSearchPageView()),
-                    );
-                  },
-                ),
-                _MenuItem(
-                  icon: Icons.grid_view_rounded,
-                  title: 'Apuestas',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const BetsPageView()),
-                    );
-                  },
-                ),
-                _MenuItem(
                   icon: Icons.bar_chart_rounded,
                   title: 'Partidas',
                   onTap: () {
@@ -148,16 +125,6 @@ class _MenuComponentState extends State<MenuComponent> {
                       MaterialPageRoute(
                         builder: (_) => const GamesResultsPageView(),
                       ),
-                    );
-                  },
-                ),
-                _MenuItem(
-                  icon: Icons.groups_rounded,
-                  title: 'Equipos',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const TeamsSearchPageView()),
                     );
                   },
                 ),

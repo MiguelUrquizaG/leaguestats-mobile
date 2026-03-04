@@ -73,6 +73,7 @@ class _HomePageContent extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Home Page', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
         actions: [

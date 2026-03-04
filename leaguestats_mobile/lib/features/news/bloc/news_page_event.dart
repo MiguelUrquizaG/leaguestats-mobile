@@ -37,6 +37,12 @@ final class GetCommentsUserNews extends NewsPageEvent {
   GetCommentsUserNews({required this.idNews});
 }
 
+final class GetLikedCommentsUserNews extends NewsPageEvent {
+  final int idNews;
+
+  GetLikedCommentsUserNews({required this.idNews});
+}
+
 final class DeleteCommentUser extends NewsPageEvent {
   final int idNews;
 

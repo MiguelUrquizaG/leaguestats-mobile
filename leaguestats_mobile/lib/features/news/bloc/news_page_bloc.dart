@@ -68,6 +68,15 @@ class NewsPageBloc extends Bloc<NewsPageEvent, NewsPageState> {
         emit(NewsPageError(message: e.toString()));
       }
     });
+    on<GetLikedCommentsUserNews>((event, emit) async {
+      emit(CommentLoading());
+      try {
+        var response = await newsService.findLikedByMe(idNews: event.idNews);
+        emit(GetLikedCommentsUserNewsSuccess(dto: response));
+      } catch (e) {
+        emit(CommentError(message: e.toString()));
+      }
+    });
     on<DeleteCommentUser>((event, emit) async {
       emit(CommentLoading());
       try {
