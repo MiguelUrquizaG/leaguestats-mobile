@@ -136,12 +136,16 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
 
   @override
   Widget build(BuildContext context) {
-    // Forcing dark theme colors for a more consistent dark look
-    final backgroundColor = const Color(0xFF181A20); // deep dark
-    final surfaceColor = const Color(0xFF23262F); // slightly lighter dark
-    final textColor = Colors.white;
-    final labelColor = const Color(0xFFBFC8D0); // muted light gray
-    final primaryColor = const Color(0xFF8B00FF); // purple accent
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+      ? const Color(0xFF0F1115)
+      : const Color(0xFFF3F4F6);
+    final surfaceColor = isDark ? const Color(0xFF1E2128) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF111827);
+    final labelColor = isDark
+      ? const Color(0xFFBFC8D0)
+      : const Color(0xFF6B7280);
+    final primaryColor = const Color(0xFF8B00FF);
 
     return MultiBlocProvider(
       providers: [
@@ -161,7 +165,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
             );
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacementNamed(context, '/login');
               }
             });
           } else if (state is RegisterPageError) {
@@ -176,61 +180,84 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
         child: Scaffold(
           backgroundColor: backgroundColor,
           body: Stack(
-          children: [
-          // Dark blurred background with subtle purple accent
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height * 0.45,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    primaryColor.withOpacity(0.15),
-                    backgroundColor,
-                  ],
-                  stops: const [0.0, 1.0],
-                ),
-              ),
-            ),
-          ),
-
-          // Main Content
-          SafeArea(
-            child: Column(
-              children: [
-                // Top Bar with Back Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/register');
-                        },
-                      ),
-                      const Spacer(),
-                      // Logo eliminado
-                    ],
+            children: [
+              Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.35,
+                    width: double.infinity,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          'https://giffiles.alphacoders.com/222/222956.gif',
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(color: Colors.black),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(color: Colors.grey[900]);
+                          },
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                backgroundColor.withValues(alpha: 0.05),
+                                backgroundColor.withValues(alpha: 0.55),
+                                backgroundColor,
+                              ],
+                              stops: const [0.0, 0.55, 1.0],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 42,
+                          left: 10,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(context, '/register');
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                
-                // Scrollable Form
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Logo eliminado
-
-                          // Form Fields
+                          Text(
+                            'Crear cuenta',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Completa tu perfil para empezar a disfrutar de LeagueStats.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: labelColor,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
                           _buildTextField(
                             label: 'Nombre',
                             hintText: 'Ejemplo: Raul',
@@ -240,7 +267,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                             textColor: textColor,
                             primaryColor: primaryColor,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           _buildTextField(
                             label: 'Email',
                             hintText: 'Ejemplo: raul@email.com',
@@ -251,7 +278,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                             textColor: textColor,
                             primaryColor: primaryColor,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           _buildTextField(
                             label: 'Contraseña',
                             hintText: 'Introduce tu contraseña',
@@ -262,7 +289,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                             textColor: textColor,
                             primaryColor: primaryColor,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           _buildTextField(
                             label: 'Repita su contraseña',
                             hintText: 'Repite tu contraseña',
@@ -273,57 +300,18 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                             textColor: textColor,
                             primaryColor: primaryColor,
                           ),
-                          const SizedBox(height: 20),
-
-                          // Dropdowns
+                          const SizedBox(height: 16),
                           BlocBuilder<CountryBloc, CountryState>(
                             builder: (context, state) {
                               if (state is CountryLoading || state is CountryInitial) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'País',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: labelColor,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      height: 56,
-                                      decoration: BoxDecoration(
-                                        color: surfaceColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: labelColor.withOpacity(0.18),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(width: 16),
-                                          SizedBox(
-                                            width: 18,
-                                            height: 18,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: primaryColor,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Text(
-                                            'Cargando países...',
-                                            style: GoogleFonts.inter(
-                                              color: labelColor,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                return _buildDropdown(
+                                  label: 'País',
+                                  hint: 'Cargando países...',
+                                  items: const [],
+                                  labelColor: labelColor,
+                                  surfaceColor: surfaceColor,
+                                  textColor: textColor,
+                                  primaryColor: primaryColor,
                                 );
                               }
 
@@ -353,7 +341,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                                 label: 'País',
                                 hint: countries.isEmpty
                                     ? 'No hay países disponibles'
-                                    : 'Seleccionar País',
+                                    : 'Seleccionar país',
                                 items: countries,
                                 selectedValue: hasSelected ? _selectedCountry : null,
                                 onChanged: countries.isEmpty
@@ -370,55 +358,18 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                               );
                             },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           BlocBuilder<TeamBloc, TeamState>(
                             builder: (context, state) {
                               if (state is TeamLoading || state is TeamInitial) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Equipo',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: labelColor,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      height: 56,
-                                      decoration: BoxDecoration(
-                                        color: surfaceColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: labelColor.withOpacity(0.18),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(width: 16),
-                                          SizedBox(
-                                            width: 18,
-                                            height: 18,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: primaryColor,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Text(
-                                            'Cargando equipos...',
-                                            style: GoogleFonts.inter(
-                                              color: labelColor,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                return _buildDropdown(
+                                  label: 'Equipo',
+                                  hint: 'Cargando equipos...',
+                                  items: const [],
+                                  labelColor: labelColor,
+                                  surfaceColor: surfaceColor,
+                                  textColor: textColor,
+                                  primaryColor: primaryColor,
                                 );
                               }
 
@@ -448,7 +399,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                                 label: 'Equipo',
                                 hint: teams.isEmpty
                                     ? 'No hay equipos disponibles'
-                                    : 'Seleccionar Equipo',
+                                    : 'Seleccionar equipo',
                                 items: teams,
                                 selectedValue: hasSelected ? _selectedTeam : null,
                                 onChanged: teams.isEmpty
@@ -465,55 +416,18 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                               );
                             },
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           BlocBuilder<LeagueBloc, LeagueState>(
                             builder: (context, state) {
                               if (state is LeagueLoading || state is LeagueInitial) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Liga',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: labelColor,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      height: 56,
-                                      decoration: BoxDecoration(
-                                        color: surfaceColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: labelColor.withOpacity(0.18),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(width: 16),
-                                          SizedBox(
-                                            width: 18,
-                                            height: 18,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: primaryColor,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Text(
-                                            'Cargando ligas...',
-                                            style: GoogleFonts.inter(
-                                              color: labelColor,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                return _buildDropdown(
+                                  label: 'Liga',
+                                  hint: 'Cargando ligas...',
+                                  items: const [],
+                                  labelColor: labelColor,
+                                  surfaceColor: surfaceColor,
+                                  textColor: textColor,
+                                  primaryColor: primaryColor,
                                 );
                               }
 
@@ -543,7 +457,7 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                                 label: 'Liga',
                                 hint: leagues.isEmpty
                                     ? 'No hay ligas disponibles'
-                                    : 'Seleccionar Liga',
+                                    : 'Seleccionar liga',
                                 items: leagues,
                                 selectedValue: hasSelected ? _selectedLeague : null,
                                 onChanged: leagues.isEmpty
@@ -560,74 +474,71 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                               );
                             },
                           ),
-                          
-                          // Space to ensure bottom button doesn't cover content
-                          const SizedBox(height: 120),
+                          const SizedBox(height: 24),
+                          BlocBuilder<RegisterPageBloc, RegisterPageState>(
+                            builder: (context, state) {
+                              final isLoading = state is RegisterPageLoading;
+                              return ElevatedButton(
+                                onPressed: isLoading ? null : _submitRegister,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primaryColor,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(double.infinity, 56),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 8,
+                                  shadowColor: primaryColor.withValues(alpha: 0.5),
+                                ),
+                                child: isLoading
+                                    ? const SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Crear cuenta',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton(
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(context, '/login');
+                            },
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 56),
+                              side: BorderSide(color: primaryColor),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Ya tengo cuenta',
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // Bottom Fixed Button Area
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
-              decoration: BoxDecoration(
-                color: surfaceColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.18),
-                    blurRadius: 16,
-                    offset: Offset(0, -2),
-                  ),
                 ],
-                borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
               ),
-              child: BlocBuilder<RegisterPageBloc, RegisterPageState>(
-                builder: (context, state) {
-                  final isLoading = state is RegisterPageLoading;
-                  return ElevatedButton(
-                    onPressed: isLoading ? null : _submitRegister,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 4,
-                      shadowColor: primaryColor.withValues(alpha: 0.4),
-                    ),
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'Crear cuenta',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                  );
-                },
-              ),
-            ),
+            ],
           ),
-          ],
-        ),
         ),
       ),
     );
