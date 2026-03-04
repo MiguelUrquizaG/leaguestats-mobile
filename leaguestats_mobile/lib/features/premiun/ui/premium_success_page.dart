@@ -3,8 +3,41 @@ import 'package:flutter/material.dart';
 class PremiumSuccessPage extends StatelessWidget {
   const PremiumSuccessPage({super.key});
 
+  String _formatSpanishDate(DateTime date) {
+    const months = [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ];
+
+    return '${date.day} de ${months[date.month - 1]} de ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final routeArgs = ModalRoute.of(context)?.settings.arguments;
+    final argsMap = routeArgs is Map<String, dynamic>
+        ? routeArgs
+        : <String, dynamic>{};
+
+    final dynamic rawPrice = argsMap['price'];
+    final price = rawPrice is num
+        ? rawPrice.toDouble()
+        : double.tryParse(rawPrice?.toString() ?? '') ?? 4.00;
+
+    final dynamic rawDate = argsMap['purchaseDate'];
+    final purchaseDate = DateTime.tryParse(rawDate?.toString() ?? '') ??
+      DateTime.now();
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
       body: SafeArea(
@@ -107,7 +140,7 @@ class PremiumSuccessPage extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            _buildSummaryRow('Plan', 'Mensual'),
+                            _buildSummaryRow('Plan', 'Único'),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               child: Divider(
@@ -116,7 +149,10 @@ class PremiumSuccessPage extends StatelessWidget {
                                 color: Colors.white.withValues(alpha: 0.1),
                               ),
                             ),
-                            _buildSummaryRow('Precio', '4.00 € / mes'),
+                            _buildSummaryRow(
+                              'Precio',
+                              '${price.toStringAsFixed(2)} € (pago único)',
+                            ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               child: Divider(
@@ -125,13 +161,16 @@ class PremiumSuccessPage extends StatelessWidget {
                                 color: Colors.white.withValues(alpha: 0.1),
                               ),
                             ),
-                            _buildSummaryRow('Siguiente cobro', '22 de Junio'),
+                            _buildSummaryRow(
+                              'Fecha de pago',
+                              _formatSpanishDate(purchaseDate),
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'Puedes gestionar o cancelar tu suscripción en cualquier momento desde los ajustes de tu cuenta.',
+                        'Tu pago Premium se ha realizado correctamente y no se renovará automáticamente.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,

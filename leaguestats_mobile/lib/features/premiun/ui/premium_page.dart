@@ -53,11 +53,11 @@ class _PremiumPageState extends State<PremiumPage> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF111827),
         title: const Text(
-          'Confirmar suscripción',
+          'Confirmar pago',
           style: TextStyle(color: Colors.white),
         ),
         content: Text(
-          '¿Seguro que quieres convertirte en Premium por ${_premiumPrice.toStringAsFixed(2)}€ al mes?',
+          '¿Seguro que quieres convertirte en Premium por ${_premiumPrice.toStringAsFixed(2)}€ en un único pago?',
           style: const TextStyle(color: Color(0xFFcbd5e1)),
         ),
         actions: [
@@ -109,7 +109,13 @@ class _PremiumPageState extends State<PremiumPage> {
         ),
       );
 
-      Navigator.of(context).pushReplacementNamed('/premium_success');
+      Navigator.of(context).pushReplacementNamed(
+        '/premium_success',
+        arguments: {
+          'price': _premiumPrice,
+          'purchaseDate': DateTime.now().toIso8601String(),
+        },
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -210,7 +216,7 @@ class _PremiumPageState extends State<PremiumPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'MENSUALMENTE',
+                          'PAGO ÚNICO',
                           style: TextStyle(
                             color: Color(0xFF1d72fe),
                             fontSize: 14,
@@ -244,7 +250,9 @@ class _PremiumPageState extends State<PremiumPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _isPremium ? 'Ya tienes Premium activo' : 'Factura Mensual',
+                          _isPremium
+                              ? 'Ya tienes Premium activo'
+                              : 'Cobro único',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF94a3b8),
@@ -290,7 +298,7 @@ class _PremiumPageState extends State<PremiumPage> {
                     : Text(
                         _isPremium
                             ? 'Ya eres Premium'
-                            : 'Suscríbete (${_premiumPrice.toStringAsFixed(2)}€)',
+                        : 'Suscríbete (${_premiumPrice.toStringAsFixed(2)}€ pago único)',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -299,7 +307,7 @@ class _PremiumPageState extends State<PremiumPage> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Sujeto a términos y condiciones. Puedes cancelar en cualquier momento desde los ajustes de tu cuenta.',
+                'Sujeto a términos y condiciones. Pago único no recurrente.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 10, color: Color(0xFF64748b)),
               ),
