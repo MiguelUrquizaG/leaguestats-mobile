@@ -25,6 +25,8 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
   final LeagueService _leagueService = LeagueService();
   final UserService _userService = UserService();
   final Map<int, Future<String>> _leagueNameFutures = {};
+  _GameStatusFilter _selectedStatusFilter = _GameStatusFilter.all;
+  int? _selectedLeagueId;
 
   @override
   void initState() {
@@ -45,6 +47,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F0F11),
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           'Partidas',
           style: GoogleFonts.inter(
@@ -88,6 +91,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
 
               final games = state.dto;
               final liveCount = games.where((game) => game.isActive == 1).length;
+              final filteredGames = _applyFilters(games);
 
               return Column(
                 children: [
@@ -96,6 +100,8 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
                     liveGames: liveCount,
                     finishedGames: games.length - liveCount,
                   ),
+                  _buildStatusFilters(),
+                  _buildLeagueFilterDropdown(games),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {
@@ -103,23 +109,41 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
                         await Future<void>.delayed(const Duration(milliseconds: 550));
                       },
                       color: const Color(0xFF9333EA),
-                      child: ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                        itemCount: games.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 14),
-                        itemBuilder: (context, index) {
-                          final game = games[index];
-                          return FutureBuilder<String>(
-                            future: _getLeagueNameFuture(game.leagueId),
-                            builder: (context, snapshot) {
-                              final leagueLabel = snapshot.data ??
-                                  (game.leagueId != null ? 'Liga #${game.leagueId}' : 'Liga');
-                              return _buildGameCard(game, leagueLabel);
-                            },
-                          );
-                        },
-                      ),
+                      child: filteredGames.isEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
+                              children: [
+                                Center(
+                                  child: Text(
+                                    'No hay partidas para este filtro',
+                                    style: GoogleFonts.inter(
+                                      color: const Color(0xFF9CA3AF),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                              itemCount: filteredGames.length,
+                              separatorBuilder: (_, _) => const SizedBox(height: 14),
+                              itemBuilder: (context, index) {
+                                final game = filteredGames[index];
+                                return FutureBuilder<String>(
+                                  future: _getLeagueNameFuture(game.leagueId),
+                                  builder: (context, snapshot) {
+                                    final leagueLabel = snapshot.data ??
+                                        (game.leagueId != null
+                                            ? 'Liga #${game.leagueId}'
+                                            : 'Liga');
+                                    return _buildGameCard(game, leagueLabel);
+                                  },
+                                );
+                              },
+                            ),
                     ),
                   ),
                 ],
@@ -470,6 +494,177 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
     );
   }
 
+  Widget _buildStatusFilters() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+      child: Row(
+        children: [
+          _buildFilterChip(
+            label: 'Todos',
+            filter: _GameStatusFilter.all,
+          ),
+          const SizedBox(width: 8),
+          _buildFilterChip(
+            label: 'En vivo',
+            filter: _GameStatusFilter.live,
+          ),
+          const SizedBox(width: 8),
+          _buildFilterChip(
+            label: 'Cerrados',
+            filter: _GameStatusFilter.closed,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeagueFilterDropdown(List<GameResponseDto> games) {
+    final leagueIds = games
+        .map((game) => game.leagueId)
+        .whereType<int>()
+        .toSet()
+        .toList()
+      ..sort();
+
+    if (leagueIds.isEmpty) {
+      return const SizedBox(height: 4);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: FutureBuilder<Map<int, String>>(
+        future: _resolveLeagueNames(leagueIds),
+        builder: (context, snapshot) {
+          final leagueNames = snapshot.data ?? const <int, String>{};
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0D1117),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<int?>(
+                value: _selectedLeagueId,
+                isExpanded: true,
+                dropdownColor: const Color(0xFF0D1117),
+                iconEnabledColor: const Color(0xFF9CA3AF),
+                style: GoogleFonts.inter(
+                  color: const Color(0xFFE5E7EB),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                items: [
+                  DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text(
+                      'Todas las ligas',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFFE5E7EB),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  ...leagueIds.map(
+                    (leagueId) => DropdownMenuItem<int?>(
+                      value: leagueId,
+                      child: Text(
+                        leagueNames[leagueId] ?? 'Liga #$leagueId',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFE5E7EB),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() => _selectedLeagueId = value);
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<Map<int, String>> _resolveLeagueNames(List<int> leagueIds) async {
+    final names = await Future.wait(
+      leagueIds.map((leagueId) async {
+        final name = await _getLeagueNameFuture(leagueId);
+        return MapEntry(leagueId, name);
+      }),
+    );
+
+    return Map<int, String>.fromEntries(names);
+  }
+
+  Widget _buildFilterChip({
+    required String label,
+    required _GameStatusFilter filter,
+  }) {
+    final isSelected = _selectedStatusFilter == filter;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedStatusFilter = filter),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF9333EA).withOpacity(0.22)
+                : const Color(0xFF0D1117),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelected
+                  ? const Color(0xFF9333EA)
+                  : Colors.white.withOpacity(0.08),
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: isSelected
+                  ? const Color(0xFFE9D5FF)
+                  : const Color(0xFF9CA3AF),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<GameResponseDto> _applyFilters(List<GameResponseDto> games) {
+    List<GameResponseDto> statusFiltered;
+
+    switch (_selectedStatusFilter) {
+      case _GameStatusFilter.live:
+        statusFiltered = games.where((game) => game.isActive == 1).toList();
+        break;
+      case _GameStatusFilter.closed:
+        statusFiltered = games.where((game) => game.isActive != 1).toList();
+        break;
+      case _GameStatusFilter.all:
+        statusFiltered = games;
+        break;
+    }
+
+    if (_selectedLeagueId == null) {
+      return statusFiltered;
+    }
+
+    return statusFiltered
+        .where((game) => game.leagueId == _selectedLeagueId)
+        .toList();
+  }
+
   Widget _buildOverviewItem({
     required String label,
     required String value,
@@ -591,3 +786,5 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
     return 'BO1';
   }
 }
+
+enum _GameStatusFilter { all, live, closed }

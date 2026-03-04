@@ -365,20 +365,21 @@ class _BetsPageViewState extends State<BetsPageView> {
   }
 
   Widget _buildTopBar() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '9:41',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).maybePop();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            color: Colors.white,
+            iconSize: 20,
+            tooltip: 'Volver',
           ),
-          Row(
+          const Row(
             children: [
               Icon(Icons.signal_cellular_alt, color: Colors.white, size: 14),
               SizedBox(width: 4),

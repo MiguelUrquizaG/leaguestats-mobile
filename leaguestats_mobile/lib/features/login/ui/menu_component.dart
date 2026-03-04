@@ -141,7 +141,7 @@ class _MenuComponentState extends State<MenuComponent> {
                 ),
                 _MenuItem(
                   icon: Icons.bar_chart_rounded,
-                  title: 'Estadísticas',
+                  title: 'Partidas',
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(

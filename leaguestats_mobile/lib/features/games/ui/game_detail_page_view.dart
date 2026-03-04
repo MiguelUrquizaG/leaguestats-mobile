@@ -48,6 +48,7 @@ class _GameDetailPageViewState extends State<GameDetailPageView> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F0F11),
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           'Detalle de partida',
           style: GoogleFonts.inter(
