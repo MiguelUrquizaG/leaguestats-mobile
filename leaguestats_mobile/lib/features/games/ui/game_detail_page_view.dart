@@ -321,6 +321,22 @@ class _GameDetailPageViewState extends State<GameDetailPageView> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  'SERIE $seriesHomeScore:$seriesAwayScore',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
               const Spacer(),
               Container(
                 padding:

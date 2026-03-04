@@ -5,9 +5,11 @@ import 'package:leaguestats_mobile/core/models/games/game_response_dto.dart';
 import 'package:leaguestats_mobile/core/services/games_service.dart';
 import 'package:leaguestats_mobile/core/services/league_service.dart';
 import 'package:leaguestats_mobile/core/services/player_service.dart';
+import 'package:leaguestats_mobile/core/services/user_service.dart';
 import 'package:leaguestats_mobile/features/games/bloc/games_page_bloc.dart';
 import 'package:leaguestats_mobile/features/games/ui/game_detail_page_view.dart';
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
+import 'package:leaguestats_mobile/features/premiun/ui/premium_page.dart';
 import 'package:leaguestats_mobile/features/players/bloc/player_page_bloc.dart'
   as player_bloc;
 
@@ -21,6 +23,7 @@ class GamesResultsPageView extends StatefulWidget {
 class _GamesResultsPageViewState extends State<GamesResultsPageView> {
   late final GamesPageBloc _gamesBloc;
   final LeagueService _leagueService = LeagueService();
+  final UserService _userService = UserService();
   final Map<int, Future<String>> _leagueNameFutures = {};
 
   @override
@@ -249,16 +252,86 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => GameDetailPageView(gameId: game.id!),
-          ),
-        );
+      onTap: () async {
+        await _handleOpenGameDetails(game.id!);
       },
       child: cardContent,
     );
+  }
+
+  Future<void> _handleOpenGameDetails(int gameId) async {
+    try {
+      final profile = await _userService.getCurrentUserProfile();
+      final isPremium = (profile.isPremium ?? 0) == 1;
+
+      if (!mounted) return;
+
+      if (isPremium) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => GameDetailPageView(gameId: gameId),
+          ),
+        );
+        return;
+      }
+
+      await showDialog<void>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF111827),
+            title: Text(
+              'Desbloquea detalles Premium',
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            content: Text(
+              'Suscríbete para ver análisis completos de cada partida, matchups detallados y estadísticas exclusivas.',
+              style: GoogleFonts.inter(color: const Color(0xFFD1D5DB)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Ahora no',
+                  style: GoogleFonts.inter(color: const Color(0xFF60A5FA)),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(this.context).push(
+                    MaterialPageRoute(builder: (_) => const PremiumPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1d72fe),
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  'Suscribirme',
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'No se pudo validar tu suscripción premium.',
+            style: GoogleFonts.inter(),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 
   Widget _buildMvpSection(int? mvpId) {

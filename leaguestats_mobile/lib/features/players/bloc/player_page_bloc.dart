@@ -8,12 +8,12 @@ part 'player_page_state.dart';
 
 class PlayerPageBloc extends Bloc<PlayerPageEvent, PlayerPageState> {
   PlayerPageBloc(PlayerService playerService) : super(PlayerPageInitial()) {
-    on<GetByIdEvent>((event, emit) async{
+    on<GetByIdEvent>((event, emit) async {
       emit(PlayerPageLoading());
-      try{
+      try {
         var player = await playerService.getById(event.id);
         emit(PlayerPageSuccess(dto: player));
-      }catch(e){
+      } catch (e) {
         emit(PlayerPageError(message: e.toString()));
       }
     });
