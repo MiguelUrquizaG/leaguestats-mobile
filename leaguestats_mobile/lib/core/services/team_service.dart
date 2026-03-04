@@ -34,14 +34,27 @@ class TeamService implements TeamInterface {
         }
 
         if (teamsPayload != null) {
-          return teamsPayload
-              .whereType<Map>()
-              .map(
-                (item) => TeamListResponseDto.fromJson(
-                  Map<String, dynamic>.from(item),
-                ),
-              )
-              .toList();
+          final teams = <TeamListResponseDto>[];
+
+          for (final item in teamsPayload) {
+            if (item is! Map) {
+              continue;
+            }
+
+            try {
+              teams.add(
+                TeamListResponseDto.fromJson(Map<String, dynamic>.from(item)),
+              );
+            } catch (_) {
+              continue;
+            }
+          }
+
+          if (teams.isEmpty) {
+            throw Exception('No se pudieron parsear equipos válidos');
+          }
+
+          return teams;
         }
 
         throw Exception('Formato de respuesta inválido para teams');

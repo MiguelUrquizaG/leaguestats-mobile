@@ -374,14 +374,41 @@ class _RegisterRealPageViewState extends State<RegisterRealPageView> {
                               }
 
                               if (state is TeamError) {
-                                return _buildDropdown(
-                                  label: 'Equipo',
-                                  hint: 'Error cargando equipos',
-                                  items: const [],
-                                  labelColor: labelColor,
-                                  surfaceColor: surfaceColor,
-                                  textColor: textColor,
-                                  primaryColor: primaryColor,
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildDropdown(
+                                      label: 'Equipo',
+                                      hint: 'Error cargando equipos',
+                                      items: const [],
+                                      labelColor: labelColor,
+                                      surfaceColor: surfaceColor,
+                                      textColor: textColor,
+                                      primaryColor: primaryColor,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            state.message,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              color: Colors.redAccent,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => context.read<TeamBloc>().add(
+                                            LoadTeamsEvent(),
+                                          ),
+                                          child: const Text('Reintentar'),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 );
                               }
 
