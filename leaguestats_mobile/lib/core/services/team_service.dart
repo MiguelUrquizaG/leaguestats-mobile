@@ -14,7 +14,7 @@ class TeamService implements TeamInterface {
     final response = await http.get(
       Uri.parse('$_apiUrl/teams'),
       headers: {'Content-Type': 'application/json'},
-    );
+    ).timeout(const Duration(seconds: 15));
 
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {

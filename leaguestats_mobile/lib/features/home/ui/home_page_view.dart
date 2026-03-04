@@ -278,6 +278,31 @@ class _HomePageContent extends StatelessWidget {
                       },
                     );
                   }
+
+                  if (state is TeamError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Error al cargar equipos',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: () => context.read<TeamBloc>().add(
+                              LoadTeamsEvent(),
+                            ),
+                            child: const Text(
+                              'Reintentar',
+                              style: TextStyle(color: Color(0xFF8b5cf6)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return const Center(child: CircularProgressIndicator());
                 },
               ),

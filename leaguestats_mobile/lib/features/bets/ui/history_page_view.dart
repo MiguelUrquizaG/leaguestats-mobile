@@ -30,6 +30,14 @@ class _HistoryPageViewState extends State<HistoryPageView>
         normalized == 'pending';
   }
 
+  Color _getClosedBetColor(int? awarded) {
+    if (awarded == 1) {
+      return const Color(0xFF10b981); // Verde para apuestas ganadas
+    } else {
+      return const Color(0xFFef4444); // Rojo para apuestas perdidas
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -257,6 +265,7 @@ class _HistoryPageViewState extends State<HistoryPageView>
                       closedBets,
                       emptyMessage: 'No hay apuestas cerradas',
                       isPremiumUser: isPremiumUser,
+                      colorizeByResult: true,
                     ),
                   ),
                 ],
@@ -272,6 +281,7 @@ class _HistoryPageViewState extends State<HistoryPageView>
     List<UserBetDto> bets, {
     required String emptyMessage,
     required bool isPremiumUser,
+    bool colorizeByResult = false,
   }) {
     if (bets.isEmpty) {
       return Center(
@@ -309,11 +319,15 @@ class _HistoryPageViewState extends State<HistoryPageView>
           : basePotentialReturn;
         final cashOutValue = potentialReturn - amount;
 
+        final cardColor = colorizeByResult
+            ? _getClosedBetColor(item.awarded)
+            : const Color(0xFF8b5cf6);
+
         return BetHistoryCard(
           gameName: bet?.league?.name ?? 'Esports',
           gameIcon: Icons.sports_esports,
-          gameIconColor: const Color(0xFF8b5cf6),
-          gameIconBgColor: const Color(0x338b5cf6),
+          gameIconColor: cardColor,
+          gameIconBgColor: cardColor.withValues(alpha: 0.2),
           isLive: (bet?.status ?? '').toLowerCase() == 'live',
           time: '${bet?.date ?? ''} ${bet?.time ?? ''}'.trim(),
           eventName: bet?.instance ?? 'Partida',
@@ -326,7 +340,7 @@ class _HistoryPageViewState extends State<HistoryPageView>
           potentialReturn: '\$${potentialReturn.toStringAsFixed(2)}',
           cashOutAvailable: _isOpenStatus(bet?.status),
           cashOutAmount: '\$${cashOutValue.toStringAsFixed(2)}',
-          primaryColor: const Color(0xFF8b5cf6),
+          primaryColor: cardColor,
         );
       },
     );
