@@ -7,8 +7,16 @@ import 'package:leaguestats_mobile/features/games/ui/games_results_page_view.dar
 import 'package:leaguestats_mobile/features/leagues/ui/leagues_search_page_view.dart';
 import 'package:leaguestats_mobile/features/players/players.dart';
 
+const Color _kPrimaryColor = Color(0xFFA855F7);
+const Color _kAccentColor = Color(0xFF3B82F6);
+const Color _kBackgroundColor = Color(0xFF121214);
+const Color _kCardColor = Color(0xFF1E1E24);
+
 class MenuComponent extends StatefulWidget {
-  const MenuComponent({super.key});
+  final VoidCallback? onOpenPartidas;
+  final VoidCallback? onOpenJugadores;
+
+  const MenuComponent({super.key, this.onOpenPartidas, this.onOpenJugadores});
 
   @override
   State<MenuComponent> createState() => _MenuComponentState();
@@ -29,13 +37,16 @@ class _MenuComponentState extends State<MenuComponent> {
       future: _userFuture,
       builder: (context, snapshot) {
         final userData = snapshot.data;
-        
+
         return Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF0D0D0D),
+          decoration: BoxDecoration(
+            color: _kBackgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
+            ),
+            border: Border(
+              top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
             ),
           ),
           child: SingleChildScrollView(
@@ -48,7 +59,7 @@ class _MenuComponentState extends State<MenuComponent> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[800],
+                    color: Colors.white.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -65,7 +76,11 @@ class _MenuComponentState extends State<MenuComponent> {
                             width: 32,
                             height: 32,
                             decoration: const BoxDecoration(
-                              color: Color(0xFF00E5FF),
+                              gradient: LinearGradient(
+                                colors: [_kPrimaryColor, _kAccentColor],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               shape: BoxShape.circle,
                             ),
                             child: const Center(
@@ -91,7 +106,7 @@ class _MenuComponentState extends State<MenuComponent> {
                                 ),
                                 TextSpan(
                                   text: 'STATS',
-                                  style: TextStyle(color: Color(0xFF00E5FF)),
+                                  style: TextStyle(color: _kPrimaryColor),
                                 ),
                               ],
                             ),
@@ -121,6 +136,10 @@ class _MenuComponentState extends State<MenuComponent> {
                   icon: Icons.bar_chart_rounded,
                   title: 'Partidas',
                   onTap: () {
+                    if (widget.onOpenPartidas != null) {
+                      widget.onOpenPartidas!();
+                      return;
+                    }
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -135,7 +154,9 @@ class _MenuComponentState extends State<MenuComponent> {
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LeaguesSearchPageView()),
+                      MaterialPageRoute(
+                        builder: (_) => const LeaguesSearchPageView(),
+                      ),
                     );
                   },
                 ),
@@ -143,9 +164,15 @@ class _MenuComponentState extends State<MenuComponent> {
                   icon: Icons.person_rounded,
                   title: 'Jugadores',
                   onTap: () {
+                    if (widget.onOpenJugadores != null) {
+                      widget.onOpenJugadores!();
+                      return;
+                    }
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const PlayersPageView()),
+                      MaterialPageRoute(
+                        builder: (_) => const PlayersPageView(),
+                      ),
                     );
                   },
                 ),
@@ -171,7 +198,7 @@ class _MenuComponentState extends State<MenuComponent> {
 
 class _ProfileCard extends StatelessWidget {
   final UserResponseDto? userData;
-  
+
   const _ProfileCard({this.userData});
 
   @override
@@ -180,21 +207,18 @@ class _ProfileCard extends StatelessWidget {
     final email = userData?.user?.email ?? 'email@ejemplo.com';
     final isPremium = userData?.isPremium == 1;
     final membershipLabel = isPremium ? 'PRO MEMBER' : 'FREE MEMBER';
-    final avatarUrl = 'https://i.pravatar.cc/150?u=$email';
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: _kCardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00E5FF).withValues(alpha: 0.05),
-            blurRadius: 20,
-            spreadRadius: 2,
+            color: _kPrimaryColor.withValues(alpha: 0.08),
+            blurRadius: 18,
+            spreadRadius: 1,
           ),
         ],
       ),
@@ -207,13 +231,18 @@ class _ProfileCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isPremium ? const Color(0xFF00E5FF) : Colors.grey,
+                    color: isPremium ? _kPrimaryColor : Colors.grey,
                     width: 2,
                   ),
                 ),
                 child: CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage(avatarUrl),
+                  backgroundColor: _kCardColor,
+                  child: Icon(
+                    Icons.person_rounded,
+                    color: isPremium ? _kPrimaryColor : Colors.grey[400],
+                    size: 30,
+                  ),
                 ),
               ),
               if (isPremium)
@@ -223,7 +252,7 @@ class _ProfileCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: Color(0xFF00E5FF),
+                      color: _kPrimaryColor,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -250,10 +279,7 @@ class _ProfileCard extends StatelessWidget {
                 ),
                 Text(
                   '@${email.split('@')[0]}',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey[500], fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Container(
@@ -262,20 +288,20 @@ class _ProfileCard extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: isPremium 
-                        ? const Color(0xFF00E5FF).withValues(alpha: 0.1)
+                    color: isPremium
+                        ? _kPrimaryColor.withValues(alpha: 0.12)
                         : Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: isPremium 
-                          ? const Color(0xFF00E5FF).withValues(alpha: 0.5)
+                      color: isPremium
+                          ? _kPrimaryColor.withValues(alpha: 0.5)
                           : Colors.grey.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Text(
                     membershipLabel,
                     style: TextStyle(
-                      color: isPremium ? const Color(0xFF00E5FF) : Colors.grey,
+                      color: isPremium ? _kPrimaryColor : Colors.grey,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -294,7 +320,7 @@ class _ProfileCard extends StatelessWidget {
             child: const Text(
               'Ver',
               style: TextStyle(
-                color: Color(0xFF00E5FF),
+                color: _kPrimaryColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -310,11 +336,7 @@ class _MenuItem extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
 
-  const _MenuItem({
-    required this.icon,
-    required this.title,
-    this.onTap,
-  });
+  const _MenuItem({required this.icon, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -325,29 +347,24 @@ class _MenuItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
-          splashColor: const Color(0xFF00E5FF).withValues(alpha: 0.1),
-          highlightColor: const Color(0xFF00E5FF).withValues(alpha: 0.05),
+          splashColor: _kPrimaryColor.withValues(alpha: 0.12),
+          highlightColor: _kPrimaryColor.withValues(alpha: 0.06),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
+              color: _kCardColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.03),
-              ),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                    color: _kPrimaryColor.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFF00E5FF),
-                    size: 20,
-                  ),
+                  child: Icon(icon, color: _kPrimaryColor, size: 20),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -385,16 +402,13 @@ class _PremiumMenuItem extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF00E5FF),
-            Color(0xFF0099CC),
-          ],
+          colors: [_kPrimaryColor, _kAccentColor],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+            color: _kPrimaryColor.withValues(alpha: 0.28),
             blurRadius: 15,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -405,9 +419,9 @@ class _PremiumMenuItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const PremiumPage()),
-            );
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PremiumPage()));
           },
           borderRadius: BorderRadius.circular(16),
           child: Padding(

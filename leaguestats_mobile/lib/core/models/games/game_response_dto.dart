@@ -61,10 +61,21 @@ class GameResponseDto {
   }
 
   static List<GameResponseDto> fromJsonList(List<dynamic> jsonList) {
-    return jsonList
-        .whereType<Map>()
-        .map((json) => GameResponseDto.fromJson(Map<String, dynamic>.from(json)))
-        .toList();
+    final games = <GameResponseDto>[];
+
+    for (final item in jsonList) {
+      if (item is! Map) {
+        continue;
+      }
+
+      try {
+        games.add(GameResponseDto.fromJson(Map<String, dynamic>.from(item)));
+      } catch (_) {
+        continue;
+      }
+    }
+
+    return games;
   }
 
   static int? _toInt(dynamic value) {

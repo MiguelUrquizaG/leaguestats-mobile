@@ -8,6 +8,8 @@ import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart';
 import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
 import 'package:leaguestats_mobile/features/login/ui/menu_component.dart';
+import 'package:leaguestats_mobile/features/games/ui/games_results_page_view.dart';
+import 'package:leaguestats_mobile/features/players/players.dart';
 import 'features/home/ui/home_page_view.dart';
 
 void main() {
@@ -51,6 +53,7 @@ class MainNavigationPage extends StatefulWidget {
 
 class _MainNavigationPageState extends State<MainNavigationPage> {
   late int _selectedIndex;
+  Widget? _menuSelectedPage;
 
   final List<Widget> _pages = [
     const HomePageView(),
@@ -73,14 +76,30 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (_) => const FractionallySizedBox(
+        builder: (_) => FractionallySizedBox(
           heightFactor: 0.65,
-          child: MenuComponent(),
+          child: MenuComponent(
+            onOpenPartidas: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _selectedIndex = 4;
+                _menuSelectedPage = const GamesResultsPageView();
+              });
+            },
+            onOpenJugadores: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _selectedIndex = 4;
+                _menuSelectedPage = const PlayersPageView();
+              });
+            },
+          ),
         ),
       );
     } else {
       setState(() {
         _selectedIndex = index;
+        _menuSelectedPage = null;
       });
     }
   }
@@ -88,7 +107,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _selectedIndex, children: _pages),
+      body:
+          _menuSelectedPage ??
+          IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

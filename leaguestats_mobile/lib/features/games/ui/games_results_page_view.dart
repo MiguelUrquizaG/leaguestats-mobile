@@ -11,7 +11,7 @@ import 'package:leaguestats_mobile/features/games/ui/game_detail_page_view.dart'
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
 import 'package:leaguestats_mobile/features/premiun/ui/premium_page.dart';
 import 'package:leaguestats_mobile/features/players/bloc/player_page_bloc.dart'
-  as player_bloc;
+    as player_bloc;
 
 class GamesResultsPageView extends StatefulWidget {
   const GamesResultsPageView({super.key});
@@ -45,6 +45,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F11),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF0F0F11),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -90,7 +91,9 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
               }
 
               final games = state.dto;
-              final liveCount = games.where((game) => game.isActive == 1).length;
+              final liveCount = games
+                  .where((game) => game.isActive == 1)
+                  .length;
               final filteredGames = _applyFilters(games);
 
               return Column(
@@ -106,13 +109,20 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
                     child: RefreshIndicator(
                       onRefresh: () async {
                         _gamesBloc.add(GetAllEvent());
-                        await Future<void>.delayed(const Duration(milliseconds: 550));
+                        await Future<void>.delayed(
+                          const Duration(milliseconds: 550),
+                        );
                       },
                       color: const Color(0xFF9333EA),
                       child: filteredGames.isEmpty
                           ? ListView(
                               physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                40,
+                                16,
+                                20,
+                              ),
                               children: [
                                 Center(
                                   child: Text(
@@ -129,13 +139,15 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
                               physics: const AlwaysScrollableScrollPhysics(),
                               padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
                               itemCount: filteredGames.length,
-                              separatorBuilder: (_, _) => const SizedBox(height: 14),
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 14),
                               itemBuilder: (context, index) {
                                 final game = filteredGames[index];
                                 return FutureBuilder<String>(
                                   future: _getLeagueNameFuture(game.leagueId),
                                   builder: (context, snapshot) {
-                                    final leagueLabel = snapshot.data ??
+                                    final leagueLabel =
+                                        snapshot.data ??
                                         (game.leagueId != null
                                             ? 'Liga #${game.leagueId}'
                                             : 'Liga');
@@ -170,8 +182,9 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
       maxGames: game.maxGames,
     );
     final statusLabel = game.isActive == 1 ? 'EN JUEGO' : 'FINALIZADO';
-    final statusBaseColor =
-        game.isActive == 1 ? const Color(0xFFF59E0B) : const Color(0xFF10B981);
+    final statusBaseColor = game.isActive == 1
+        ? const Color(0xFFF59E0B)
+        : const Color(0xFF10B981);
     final topGradient = game.isActive == 1
         ? const [Color(0xFF23183B), Color(0xFF151927)]
         : const [Color(0xFF171B24), Color(0xFF11141B)];
@@ -210,7 +223,10 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusBaseColor.withOpacity(0.16),
                   borderRadius: BorderRadius.circular(999),
@@ -233,14 +249,14 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
           Row(
             children: [
               Expanded(
-                child: _buildTeamSide(
-                  name: homeName,
-                  logoUrl: homeLogo,
-                ),
+                child: _buildTeamSide(name: homeName, logoUrl: homeLogo),
               ),
               Container(
                 constraints: const BoxConstraints(minWidth: 96),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0D1117),
                   borderRadius: BorderRadius.circular(14),
@@ -259,10 +275,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
                 ),
               ),
               Expanded(
-                child: _buildTeamSide(
-                  name: awayName,
-                  logoUrl: awayLogo,
-                ),
+                child: _buildTeamSide(name: awayName, logoUrl: awayLogo),
               ),
             ],
           ),
@@ -293,9 +306,7 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
       if (isPremium) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => GameDetailPageView(gameId: gameId),
-          ),
+          MaterialPageRoute(builder: (_) => GameDetailPageView(gameId: gameId)),
         );
         return;
       }
@@ -371,81 +382,85 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
     }
 
     return BlocProvider(
-      create: (_) => player_bloc.PlayerPageBloc(PlayerService())
-        ..add(player_bloc.GetByIdEvent(id: mvpId)),
-      child: BlocBuilder<player_bloc.PlayerPageBloc, player_bloc.PlayerPageState>(
-        builder: (context, state) {
-          if (state is player_bloc.PlayerPageSuccess) {
-            final player = state.dto;
-            final playerName = (player.name ?? '').trim().isEmpty
-                ? 'Jugador #$mvpId'
-                : player.name!;
+      create: (_) =>
+          player_bloc.PlayerPageBloc(PlayerService())
+            ..add(player_bloc.GetByIdEvent(id: mvpId)),
+      child:
+          BlocBuilder<player_bloc.PlayerPageBloc, player_bloc.PlayerPageState>(
+            builder: (context, state) {
+              if (state is player_bloc.PlayerPageSuccess) {
+                final player = state.dto;
+                final playerName = (player.name ?? '').trim().isEmpty
+                    ? 'Jugador #$mvpId'
+                    : player.name!;
 
-            return Row(
-              children: [
-                Container(
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0D1117),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: Colors.white.withOpacity(0.08)),
-                  ),
-                  padding: const EdgeInsets.all(2),
-                  child: DynamicNetworkImage(
-                    url: player.photo ?? '',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'MVP: $playerName',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                return Row(
+                  children: [
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0D1117),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.08),
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(2),
+                      child: DynamicNetworkImage(
+                        url: player.photo ?? '',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'MVP: $playerName',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFFEAB308),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              if (state is player_bloc.PlayerPageError) {
+                return Text(
+                  'MVP: Jugador #$mvpId',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFFEAB308),
+                    color: const Color(0xFF9CA3AF),
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
-                ),
-              ],
-            );
-          }
+                );
+              }
 
-          if (state is player_bloc.PlayerPageError) {
-            return Text(
-              'MVP: Jugador #$mvpId',
-              style: GoogleFonts.inter(
-                color: const Color(0xFF9CA3AF),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            );
-          }
-
-          return Row(
-            children: [
-              const SizedBox(
-                width: 12,
-                height: 12,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Color(0xFFEAB308),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Cargando MVP...',
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF9CA3AF),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+              return Row(
+                children: [
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFEAB308),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Cargando MVP...',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF9CA3AF),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 
@@ -499,32 +514,20 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
       child: Row(
         children: [
-          _buildFilterChip(
-            label: 'Todos',
-            filter: _GameStatusFilter.all,
-          ),
+          _buildFilterChip(label: 'Todos', filter: _GameStatusFilter.all),
           const SizedBox(width: 8),
-          _buildFilterChip(
-            label: 'En vivo',
-            filter: _GameStatusFilter.live,
-          ),
+          _buildFilterChip(label: 'En vivo', filter: _GameStatusFilter.live),
           const SizedBox(width: 8),
-          _buildFilterChip(
-            label: 'Cerrados',
-            filter: _GameStatusFilter.closed,
-          ),
+          _buildFilterChip(label: 'Cerrados', filter: _GameStatusFilter.closed),
         ],
       ),
     );
   }
 
   Widget _buildLeagueFilterDropdown(List<GameResponseDto> games) {
-    final leagueIds = games
-        .map((game) => game.leagueId)
-        .whereType<int>()
-        .toSet()
-        .toList()
-      ..sort();
+    final leagueIds =
+        games.map((game) => game.leagueId).whereType<int>().toSet().toList()
+          ..sort();
 
     if (leagueIds.isEmpty) {
       return const SizedBox(height: 4);
@@ -697,27 +700,21 @@ class _GamesResultsPageViewState extends State<GamesResultsPageView> {
   Future<String> _getLeagueNameFuture(int? leagueId) {
     if (leagueId == null) return Future.value('Liga');
 
-    return _leagueNameFutures.putIfAbsent(
-      leagueId,
-      () async {
-        try {
-          final league = await _leagueService.getById(leagueId);
-          final name = (league.name ?? '').trim();
-          if (name.isNotEmpty) {
-            return name;
-          }
-          return 'Liga #$leagueId';
-        } catch (_) {
-          return 'Liga #$leagueId';
+    return _leagueNameFutures.putIfAbsent(leagueId, () async {
+      try {
+        final league = await _leagueService.getById(leagueId);
+        final name = (league.name ?? '').trim();
+        if (name.isNotEmpty) {
+          return name;
         }
-      },
-    );
+        return 'Liga #$leagueId';
+      } catch (_) {
+        return 'Liga #$leagueId';
+      }
+    });
   }
 
-  Widget _buildTeamSide({
-    required String name,
-    required String logoUrl,
-  }) {
+  Widget _buildTeamSide({required String name, required String logoUrl}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

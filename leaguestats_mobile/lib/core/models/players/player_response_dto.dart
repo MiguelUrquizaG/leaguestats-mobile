@@ -24,25 +24,68 @@ class PlayerResponseDto {
   });
 
   PlayerResponseDto.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    photo = json['photo'];
-    teamId = json['team_id'];
-    kda = json['kda'];
-    position = json['position'];
-    birthDate = json['birth_date'];
-    countryId = json['country_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    id = _toInt(json['id']);
+    name = _toStringValue(json['name']);
+    photo = _toStringValue(json['photo']);
+    teamId = _toInt(json['team_id']);
+    kda = _toStringValue(json['kda']);
+    position = _toStringValue(json['position']);
+    birthDate = _toStringValue(json['birth_date']);
+    countryId = _toInt(json['country_id']);
+    createdAt = _toStringValue(json['created_at']);
+    updatedAt = _toStringValue(json['updated_at']);
   }
 
   static List<PlayerResponseDto> fromJsonList(List<dynamic>? jsonList) {
     if (jsonList == null || jsonList.isEmpty) {
       return [];
     }
-    return jsonList
-        .map((json) => PlayerResponseDto.fromJson(json as Map<String, dynamic>))
-        .toList();
+
+    final players = <PlayerResponseDto>[];
+
+    for (final item in jsonList) {
+      if (item is! Map) {
+        continue;
+      }
+
+      try {
+        players.add(
+          PlayerResponseDto.fromJson(Map<String, dynamic>.from(item)),
+        );
+      } catch (_) {
+        continue;
+      }
+    }
+
+    return players;
+  }
+
+  static int? _toInt(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value is int) {
+      return value;
+    }
+
+    if (value is num) {
+      return value.toInt();
+    }
+
+    if (value is String) {
+      return int.tryParse(value.trim());
+    }
+
+    return null;
+  }
+
+  static String? _toStringValue(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
+    return value.toString();
   }
 
   Map<String, dynamic> toJson() {

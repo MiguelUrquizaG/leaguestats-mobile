@@ -58,7 +58,8 @@ class _PlayersPageViewState extends State<PlayersPageView> {
 
       bool matchesQuery = true;
       if (query.isNotEmpty) {
-        matchesQuery = (player.name?.toLowerCase().contains(query) ?? false) ||
+        matchesQuery =
+            (player.name?.toLowerCase().contains(query) ?? false) ||
             (player.position?.toLowerCase().contains(query) ?? false);
       }
 
@@ -80,7 +81,8 @@ class _PlayersPageViewState extends State<PlayersPageView> {
               Expanded(
                 child: BlocBuilder<PlayerPageBloc, PlayerPageState>(
                   builder: (context, state) {
-                    if (state is PlayerPageInitial || state is PlayerPageLoading) {
+                    if (state is PlayerPageInitial ||
+                        state is PlayerPageLoading) {
                       return const Center(
                         child: CircularProgressIndicator(
                           color: Color(0xFF9333EA),
@@ -182,21 +184,6 @@ class _PlayersPageViewState extends State<PlayersPageView> {
         children: [
           Row(
             children: [
-              IconButton(
-                onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(
-                  Icons.arrow_back_ios_new,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                style: IconButton.styleFrom(
-                  backgroundColor: const Color(0xFF1F1F23),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
               Text(
                 'Jugadores',
                 style: GoogleFonts.inter(
@@ -213,9 +200,7 @@ class _PlayersPageViewState extends State<PlayersPageView> {
             decoration: BoxDecoration(
               color: const Color(0xFF1F1F23),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.05),
-              ),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
             ),
             child: TextField(
               controller: _searchController,
@@ -227,16 +212,10 @@ class _PlayersPageViewState extends State<PlayersPageView> {
                   color: const Color(0xFF6B7280),
                   fontSize: 16,
                 ),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: Color(0xFF6B7280),
-                ),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF6B7280)),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(
-                          Icons.clear,
-                          color: Color(0xFF6B7280),
-                        ),
+                        icon: const Icon(Icons.clear, color: Color(0xFF6B7280)),
                         onPressed: () {
                           _searchController.clear();
                         },
@@ -291,9 +270,7 @@ class _PlayersPageViewState extends State<PlayersPageView> {
                 child: Text(
                   position,
                   style: GoogleFonts.inter(
-                    color: isSelected
-                        ? Colors.white
-                        : const Color(0xFF9CA3AF),
+                    color: isSelected ? Colors.white : const Color(0xFF9CA3AF),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -323,9 +300,7 @@ class _PlayersPageViewState extends State<PlayersPageView> {
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.05),
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -443,18 +418,12 @@ class _PlayersPageViewState extends State<PlayersPageView> {
       decoration: BoxDecoration(
         color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-        ),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 14,
-          ),
+          Icon(icon, color: color, size: 14),
           const SizedBox(width: 4),
           Text(
             text,
