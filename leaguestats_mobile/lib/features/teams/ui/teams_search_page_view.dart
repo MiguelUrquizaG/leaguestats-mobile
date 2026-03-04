@@ -137,15 +137,6 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              color: Colors.white,
-              size: 20,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const SizedBox(width: 16),
           Expanded(
             child: Container(
               height: 48,

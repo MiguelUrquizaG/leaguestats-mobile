@@ -28,30 +28,45 @@ import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_search_page_view.dart';
 import 'package:leaguestats_mobile/features/profile/profile.dart';
 
-class HomePageView extends StatelessWidget {
+class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
+
+  @override
+  State<HomePageView> createState() => _HomePageViewState();
+}
+
+class _HomePageViewState extends State<HomePageView> {
+  late final TeamBloc _teamBloc;
+  late final LeagueBloc _leagueBloc;
+  late final NewsPageBloc _newsBloc;
+  late final UserPageBloc _userBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _teamBloc = TeamBloc(TeamService())..add(LoadTeamsEvent());
+    _leagueBloc = LeagueBloc(LeagueService())..add(LoadLeaguesEvent());
+    _newsBloc = NewsPageBloc(NewsService())..add(NewsGetAllEvent());
+    _userBloc = UserPageBloc(UserService())..add(UserProfileByEmailEvent());
+  }
+
+  @override
+  void dispose() {
+    _teamBloc.close();
+    _leagueBloc.close();
+    _newsBloc.close();
+    _userBloc.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => TeamBloc(TeamService())..add(LoadTeamsEvent()),
-        ),
-        BlocProvider(
-          create: (context) =>
-              LeagueBloc(LeagueService())..add(LoadLeaguesEvent()),
-        ),
-        BlocProvider(
-          create: (context) =>
-              NewsPageBloc(NewsService())..add(NewsGetAllEvent()),
-        ),
-        BlocProvider(
-          create: (context) => UserPageBloc(UserService())
-            ..add(
-              UserProfileByEmailEvent(),
-            ), // Al enviarlo vacío, el Bloc sabe que debe mirar el Storage
-        ),
+        BlocProvider.value(value: _teamBloc),
+        BlocProvider.value(value: _leagueBloc),
+        BlocProvider.value(value: _newsBloc),
+        BlocProvider.value(value: _userBloc),
       ],
       child: const _HomePageContent(),
     );

@@ -502,7 +502,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                           Text(
                             'x${_premiumMultiplier.toStringAsFixed(2)} Multiplicador',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: const Color.fromARGB(255, 0, 0, 0),
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                               letterSpacing: 0.3,
@@ -520,7 +520,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                         child: Text(
                           'Ganancia potencial: ${premiumPotentialReturn.toStringAsFixed(2)}€ (+${premiumExtra.toStringAsFixed(2)}€ bonus)',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: const Color.fromARGB(255, 0, 0, 0),
                             fontSize: 12.5,
                             height: 1.4,
                             fontWeight: FontWeight.w500,
