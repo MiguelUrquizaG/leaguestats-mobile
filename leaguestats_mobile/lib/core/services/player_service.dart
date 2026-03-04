@@ -19,14 +19,37 @@ class PlayerService implements PlayersInterface {
       },
     );
 
-    try{
-      if(response.statusCode>=200 && response.statusCode<300){
+    try {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         var player = PlayerResponseDto.fromJson(jsonDecode(response.body));
         return player;
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<List<PlayerResponseDto>> getAll() async {
+    var token = await storageService.getToken();
+    var response = await http.get(
+      Uri.parse('$_apiUrl/players'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    try {
+      if(response.statusCode>=200 && response.statusCode<300){
+        var listPlayers = PlayerResponseDto.fromJsonList(jsonDecode(response.body));
+        return listPlayers;
       }else{
         throw Exception(response.body);
       }
-    }catch(e){
+    } catch (e) {
       throw Exception(e.toString());
     }
   }

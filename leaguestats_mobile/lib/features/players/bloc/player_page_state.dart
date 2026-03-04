@@ -13,6 +13,12 @@ final class PlayerPageSuccess extends PlayerPageState {
   PlayerPageSuccess({required this.dto});
 }
 
+final class AllPlayersPageSuccess extends PlayerPageState {
+  final List<PlayerResponseDto> dto;
+
+  AllPlayersPageSuccess({required this.dto});
+}
+
 final class PlayerPageError extends PlayerPageState {
   final String message;
 

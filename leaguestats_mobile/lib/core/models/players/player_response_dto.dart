@@ -36,6 +36,15 @@ class PlayerResponseDto {
     updatedAt = json['updated_at'];
   }
 
+  static List<PlayerResponseDto> fromJsonList(List<dynamic>? jsonList) {
+    if (jsonList == null || jsonList.isEmpty) {
+      return [];
+    }
+    return jsonList
+        .map((json) => PlayerResponseDto.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;

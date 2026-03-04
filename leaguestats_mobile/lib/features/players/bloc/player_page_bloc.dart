@@ -17,5 +17,14 @@ class PlayerPageBloc extends Bloc<PlayerPageEvent, PlayerPageState> {
         emit(PlayerPageError(message: e.toString()));
       }
     });
+    on<GetAllEvent>((event, emit) async {
+      emit(PlayerPageLoading());
+      try {
+        var playersList = await playerService.getAll();
+        emit(AllPlayersPageSuccess(dto: playersList));
+      } catch (e) {
+        emit(PlayerPageError(message: e.toString()));
+      }
+    });
   }
 }

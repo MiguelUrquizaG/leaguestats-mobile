@@ -8,3 +8,5 @@ final class GetByIdEvent extends PlayerPageEvent{
 
   GetByIdEvent({required this.id});
 }
+
+final class GetAllEvent extends PlayerPageEvent{}

@@ -5,6 +5,7 @@ import 'package:leaguestats_mobile/core/models/user/user_response_dto.dart';
 import 'package:leaguestats_mobile/features/profile/ui/profile_page_view.dart';
 import 'package:leaguestats_mobile/features/games/ui/games_results_page_view.dart';
 import 'package:leaguestats_mobile/features/leagues/ui/leagues_search_page_view.dart';
+import 'package:leaguestats_mobile/features/players/players.dart';
 
 class MenuComponent extends StatefulWidget {
   const MenuComponent({super.key});
@@ -138,9 +139,15 @@ class _MenuComponentState extends State<MenuComponent> {
                     );
                   },
                 ),
-                const _MenuItem(
+                _MenuItem(
                   icon: Icons.person_rounded,
                   title: 'Jugadores',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const PlayersPageView()),
+                    );
+                  },
                 ),
                 const _MenuItem(
                   icon: Icons.military_tech_rounded,
