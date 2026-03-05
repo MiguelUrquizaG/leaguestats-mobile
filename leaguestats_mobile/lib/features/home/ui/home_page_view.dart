@@ -338,47 +338,171 @@ class _HomePageContent extends StatelessWidget {
     dynamic profile,
     String displayName,
   ) {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProfilePageView()),
+    final isPremium = (profile?.isPremium ?? 0) == 1;
+    
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ProfilePageView()),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: isPremium
+                ? [
+                    const Color(0xFF1d72fe).withOpacity(0.15),
+                    const Color(0xFF1d72fe).withOpacity(0.05),
+                  ]
+                : [
+                    Colors.deepPurple.withOpacity(0.15),
+                    Colors.deepPurple.withOpacity(0.05),
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: const ProfileIconWidget(),
+          border: Border.all(
+            color: (isPremium ? const Color(0xFF1d72fe) : Colors.deepPurple)
+                .withOpacity(0.4),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: (isPremium ? const Color(0xFF1d72fe) : Colors.deepPurple)
+                  .withOpacity(0.2),
+              blurRadius: 15,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        const SizedBox(width: 20),
-        Expanded(
-          // Añadido Expanded para evitar errores de diseño si el nombre es largo
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                displayName,
-                style: const TextStyle(color: Colors.white, fontSize: 20),
-                overflow: TextOverflow.ellipsis,
-              ),
-              Row(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            ProfileIconWidget(isPremium: isPremium),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    profile.country?.name ?? 'País',
-                    style: const TextStyle(color: Colors.white),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          displayName,
+                          style: TextStyle(
+                            color: isPremium
+                                ? const Color(0xFF1d72fe)
+                                : Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isPremium)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1d72fe).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF1d72fe).withOpacity(0.5),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: Color(0xFF1d72fe),
+                                size: 12,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'PRO',
+                                style: TextStyle(
+                                  color: Color(0xFF1d72fe),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Image.network(
-                    _flagUrlFromCode(profile.country?.flag),
-                    width: 25,
-                    height: 18,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.flag, color: Colors.white24, size: 18),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        color: (isPremium
+                                ? const Color(0xFF1d72fe)
+                                : Colors.deepPurple)
+                            .withOpacity(0.7),
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          profile.country?.name ?? 'País desconocido',
+                          style: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 14,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: Image.network(
+                          _flagUrlFromCode(profile.country?.flag),
+                          width: 24,
+                          height: 16,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.flag,
+                            color: (isPremium
+                                    ? const Color(0xFF1d72fe)
+                                    : Colors.deepPurple)
+                                .withOpacity(0.5),
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: (isPremium ? const Color(0xFF1d72fe) : Colors.deepPurple)
+                    .withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios,
+                color: (isPremium ? const Color(0xFF1d72fe) : Colors.deepPurple)
+                    .withOpacity(0.8),
+                size: 16,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
