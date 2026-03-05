@@ -54,7 +54,7 @@ class _MenuComponentState extends State<MenuComponent> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 12),
-                // Drag handle
+                
                 Container(
                   width: 40,
                   height: 4,
@@ -64,7 +64,7 @@ class _MenuComponentState extends State<MenuComponent> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Header
+                
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
@@ -125,13 +125,13 @@ class _MenuComponentState extends State<MenuComponent> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Profile Card
+                
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: _ProfileCard(userData: userData),
                 ),
                 const SizedBox(height: 24),
-                // Menu Items
+                
                 _MenuItem(
                   icon: Icons.bar_chart_rounded,
                   title: 'Partidas',
@@ -181,7 +181,7 @@ class _MenuComponentState extends State<MenuComponent> {
                   title: 'Campeones',
                 ),
                 const SizedBox(height: 8),
-                // Premium Item
+                
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: _PremiumMenuItem(),

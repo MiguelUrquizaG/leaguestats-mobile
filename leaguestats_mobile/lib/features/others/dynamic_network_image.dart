@@ -13,7 +13,6 @@ class DynamicNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Aplicamos tu lógica de validación de URL
     final String cleanUrl = _getValidUrl(url);
 
     if (cleanUrl.endsWith('.svg')) {
@@ -27,7 +26,7 @@ class DynamicNetworkImage extends StatelessWidget {
       return Image.network(
         cleanUrl,
         fit: fit,
-        // Este bloque es vital para atrapar errores de carga (404, 500, etc.)
+
         errorBuilder: (context, error, stackTrace) => Container(
           color: Colors.grey[900],
           child: const Icon(Icons.broken_image, color: Colors.white24),
@@ -38,7 +37,6 @@ class DynamicNetworkImage extends StatelessWidget {
 
   String _getValidUrl(String? url) {
     if (url == null || url.trim().isEmpty || !url.startsWith('http')) {
-      // Usamos el JPG para el placeholder para evitar que falle el Image.network
       return 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg';
     }
     return url;

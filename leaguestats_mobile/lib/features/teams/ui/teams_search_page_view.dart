@@ -22,7 +22,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
   @override
   void initState() {
     super.initState();
-    // Inicializamos con el TeamBloc y cargamos los equipos
+    
     _teamBloc = TeamBloc(TeamService())..add(LoadTeamsEvent());
     _searchController.addListener(_onSearchChanged);
   }
@@ -39,18 +39,18 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
     super.dispose();
   }
 
-  // Lógica de filtrado para equipos
+  
   List<TeamListResponseDto> _filterTeams(List<TeamListResponseDto> teams) {
     final query = _searchController.text.trim().toLowerCase();
 
     return teams.where((team) {
-      // 1. Filtro por Pestaña (puedes filtrar por nombre de liga si lo deseas)
+      
       bool matchesTab = true;
       if (_selectedTab != 'Todos') {
         matchesTab = team.league?.name == _selectedTab;
       }
 
-      // 2. Filtro por consulta de búsqueda (Nombre del equipo o liga)
+      
       bool matchesQuery = true;
       if (query.isNotEmpty) {
         matchesQuery =
@@ -168,7 +168,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
   }
 
   Widget _buildTabs() {
-    // Aquí puedes poner nombres de ligas reales que vengan en tus datos
+    
     final List<String> categories = ['Todos', 'LEC', 'LCK', 'LCS', 'LVP'];
 
     return Container(
@@ -219,7 +219,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
 
     return GestureDetector(
       onTap: () {
-        // NAVEGACIÓN A LA PÁGINA DE DETALLE
+        
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => TeamDetailPageView(team: team)),
@@ -236,7 +236,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            // Logo de fondo difuminado decorativo
+            
             Positioned(
               right: -20,
               bottom: -20,
@@ -249,7 +249,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  // Logo del equipo
+                  
                   Container(
                     width: 80,
                     height: 80,
@@ -261,7 +261,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
                     child: Image.network(team.logo ?? '', fit: BoxFit.contain),
                   ),
                   const SizedBox(width: 16),
-                  // Información
+                  
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,7 +294,7 @@ class _TeamsSearchPageView extends State<TeamsSearchPageView> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        // Estadísticas de victorias/derrotas
+                        
                         Row(
                           children: [
                             _buildStatBadge(

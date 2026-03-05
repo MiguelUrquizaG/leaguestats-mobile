@@ -14,7 +14,7 @@ class RegisterPageView extends StatefulWidget {
 }
 
 class _RegisterPageViewState extends State<RegisterPageView> {
-  // No se necesitan controladores aquí
+  
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +25,10 @@ class _RegisterPageViewState extends State<RegisterPageView> {
     final surfaceColor = isDark ? const Color(0xFF1E2128) : Colors.white;
     final textColor = isDark
         ? Colors.white
-        : const Color(0xFF111827); // gray-900
+        : const Color(0xFF111827); 
     final subtitleColor = isDark
         ? const Color(0xFF9CA3AF)
-        : const Color(0xFF6B7280); // gray-400 : gray-500
+        : const Color(0xFF6B7280); 
     final primaryColor = const Color(0xFF8B00FF);
 
     return BlocProvider(
@@ -64,10 +64,10 @@ class _RegisterPageViewState extends State<RegisterPageView> {
           backgroundColor: backgroundColor,
           body: Stack(
             children: [
-              // Background content
+              
               Column(
                 children: [
-                  // Top half: Image with gradient
+                  
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.55,
                     width: double.infinity,
@@ -78,16 +78,16 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                           'https://giffiles.alphacoders.com/214/214339.gif',
                           fit: BoxFit.cover,
                           alignment: Alignment.topCenter,
-                          // Si la URL falla, muestra un fondo negro liso en lugar de un error
+                          
                           errorBuilder: (context, error, stackTrace) =>
                               Container(color: Colors.black),
-                          // Mientras carga, muestra un color gris oscuro
+                          
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return Container(color: Colors.grey[900]);
                           },
                         ),
-                        // Gradient overlay
+                        
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -102,8 +102,8 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                             ),
                           ),
                         ),
-                        // Diamond icon at the bottom of the image section
-                        // Diamond icon at the bottom of the image section
+                        
+                        
                         Positioned(
                           bottom: 16,
                           left: 0,
@@ -117,7 +117,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                                 children: [
                                   SvgPicture.string(
                                     '''
-        <svg fill="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <svg fill="none" viewBox="0 0 100 100" xmlns="http:
           <path d="M50 20L20 50L50 80L80 50L50 20Z" stroke="black" stroke-linejoin="round" stroke-width="8"></path>
           <path d="M50 35L35 50L50 65L65 50L50 35Z" fill="black"></path>
         </svg>
@@ -134,15 +134,15 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                     ),
                   ),
 
-                  // Bottom half: Form and buttons
+                  
                   Expanded(
                     child: Container(
                       color: backgroundColor,
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Column(
                         children: [
-                          const SizedBox(height: 8), // Adjusted padding
-                          // Title
+                          const SizedBox(height: 8), 
+                          
                           Text(
                             'LeagueStats',
                             style: GoogleFonts.inter(
@@ -154,7 +154,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 12),
-                          // Subtitle
+                          
                           Text(
                             'Disfruta de la mejor aplicación de competitivo de League of Legends.',
                             style: GoogleFonts.inter(
@@ -166,7 +166,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                           ),
                           const Spacer(),
 
-                          // Botón para ir a Login
+                          
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pushReplacementNamed(context, '/login');
@@ -190,7 +190,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Botón para ir a la página de registro real
+                          
                           OutlinedButton(
                             onPressed: () {
                               Navigator.pushReplacementNamed(
@@ -215,7 +215,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          // Home indicator mock
+                          
                           Container(
                             width: 128,
                             height: 6,
@@ -234,7 +234,7 @@ class _RegisterPageViewState extends State<RegisterPageView> {
                 ],
               ),
 
-              // Top status bar overlay mock
+              
               Positioned(
                 top: 0,
                 left: 0,

@@ -50,12 +50,12 @@ class BetHistoryCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF18181b), // card-gradient-start
-            Color(0xFF0f0f11), // card-gradient-end
+            Color(0xFF18181b), 
+            Color(0xFF0f0f11), 
           ],
         ),
         border: Border.all(
-          color: const Color(0xFF27272a), // border-subtle
+          color: const Color(0xFF27272a), 
           width: 1,
         ),
         boxShadow: const [
@@ -69,7 +69,7 @@ class BetHistoryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
+          
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -163,7 +163,7 @@ class BetHistoryCard extends StatelessWidget {
             ),
           ),
 
-          // Body
+          
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -226,7 +226,7 @@ class BetHistoryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Prediction and Odds
+                
                 Container(
                   padding: const EdgeInsets.only(top: 12),
                   decoration: BoxDecoration(
@@ -310,12 +310,12 @@ class BetHistoryCard extends StatelessWidget {
             ),
           ),
 
-          // Footer
+          
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
             child: Column(
               children: [
-                // Bet Info
+                
                 Container(
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 16),
@@ -382,7 +382,7 @@ class BetHistoryCard extends StatelessWidget {
                   ),
                 ),
 
-                // Cash Out Button
+                
                 if (cashOutAvailable)
                   Container(
                     height: 44,

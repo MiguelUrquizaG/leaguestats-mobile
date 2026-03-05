@@ -477,7 +477,7 @@ class _CommentsModalState extends State<CommentsModal> {
             ),
             child: Column(
               children: [
-                // Encabezado del Modal
+                
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 8.0, 16.0),
                   child: Column(
@@ -525,13 +525,13 @@ class _CommentsModalState extends State<CommentsModal> {
                     ],
                   ),
                 ),
-                // Divider
+                
                 Container(
                   height: 1,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   color: Colors.white.withOpacity(0.1),
                 ),
-                // Lista de Comentarios
+                
                 Expanded(
                   child: Builder(
                     builder: (context) {
@@ -714,7 +714,7 @@ class _CommentsModalState extends State<CommentsModal> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Encabezado del comentario (usuario y fecha)
+            
             Row(
               children: [
                 Container(
@@ -793,7 +793,7 @@ class _CommentsModalState extends State<CommentsModal> {
               ],
             ),
             const SizedBox(height: 14),
-            // Texto del comentario
+            
             Text(
               comment.comment ?? '',
               style: GoogleFonts.merriweather(
@@ -803,7 +803,7 @@ class _CommentsModalState extends State<CommentsModal> {
               ),
             ),
             const SizedBox(height: 14),
-            // Botón Me Gusta mejorado
+            
             Material(
               color: Colors.transparent,
               child: InkWell(

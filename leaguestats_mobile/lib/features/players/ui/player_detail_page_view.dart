@@ -59,7 +59,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
   Future<void> _loadAdditionalData() async {
     final player = widget.player;
     
-    // Cargar nombre del equipo
+    
     if (player.teamId != null) {
       try {
         final team = await TeamService().getById(player.teamId!);
@@ -77,7 +77,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
       }
     }
 
-    // Cargar nombre del país
+    
     if (player.countryId != null) {
       try {
         final countries = await CountryService().getAll();
@@ -108,8 +108,8 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
     final firstLetter = code.codeUnitAt(0);
     final secondLetter = code.codeUnitAt(1);
     
-    // Convertir código ISO a Regional Indicator Symbols
-    // A = U+1F1E6, B = U+1F1E7, etc.
+    
+    
     final flagFirst = String.fromCharCode(0x1F1E6 + (firstLetter - 0x41));
     final flagSecond = String.fromCharCode(0x1F1E6 + (secondLetter - 0x41));
     
@@ -132,7 +132,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
           backgroundColor: const Color(0xFF09090B),
           body: Stack(
             children: [
-              // Fondo con gradiente
+              
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: const BoxDecoration(
@@ -145,7 +145,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
                 ),
               ),
 
-              // Círculos decorativos
+              
               Positioned(
                 top: -120,
                 left: -80,
@@ -171,7 +171,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
                 ),
               ),
 
-              // Contenido principal
+              
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: CustomScrollView(
@@ -294,7 +294,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
           ),
           child: Column(
             children: [
-              // Avatar del jugador
+              
               Container(
                 width: 150,
                 height: 150,
@@ -339,7 +339,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
               ),
               const SizedBox(height: 20),
 
-              // Nombre del jugador
+              
               Text(
                 name,
                 textAlign: TextAlign.center,
@@ -352,7 +352,7 @@ class _PlayerDetailPageViewState extends State<PlayerDetailPageView>
               ),
               const SizedBox(height: 8),
 
-              // Posición badge
+              
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

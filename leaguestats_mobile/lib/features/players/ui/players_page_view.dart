@@ -317,7 +317,7 @@ class _PlayersPageViewState extends State<PlayersPageView> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // Avatar del jugador
+                
                 Container(
                   width: 70,
                   height: 70,
@@ -359,7 +359,7 @@ class _PlayersPageViewState extends State<PlayersPageView> {
                 ),
                 const SizedBox(width: 16),
 
-                // Info del jugador
+                
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,7 +394,7 @@ class _PlayersPageViewState extends State<PlayersPageView> {
                   ),
                 ),
 
-                // Flecha de navegación
+                
                 const Icon(
                   Icons.arrow_forward_ios,
                   color: Color(0xFF6B7280),

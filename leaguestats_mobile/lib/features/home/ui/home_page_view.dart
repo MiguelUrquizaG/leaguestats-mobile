@@ -110,17 +110,15 @@ class _HomePageContent extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: ListView(
           children: [
-            // --- SECCIÓN PERFIL ---
             BlocBuilder<UserPageBloc, UserPageState>(
               builder: (context, state) {
                 if (state is UserPageSuccess) {
                   final profile = state.dto;
                   final displayName =
                       profile.username ?? profile.user?.name ?? 'Usuario';
-                  // Pasamos el context para que el botón de perfil funcione
                   return _buildHeader(context, profile, displayName);
                 }
-                // Mientras carga, mostramos el spinner para evitar nombres por defecto
+
                 return const SizedBox(
                   height: 80,
                   child: Center(
@@ -132,7 +130,6 @@ class _HomePageContent extends StatelessWidget {
 
             const SizedBox(height: 15),
 
-            // Título Noticias con navegación
             _buildSectionTitle(
               context,
               'Noticias destacadas',
@@ -142,20 +139,15 @@ class _HomePageContent extends StatelessWidget {
               ),
             ),
 
-            // --- SECCIÓN NOTICIAS ---
-            // --- SECCIÓN NOTICIAS ---
             SizedBox(
               height: 200,
               child: BlocBuilder<NewsPageBloc, NewsPageState>(
                 builder: (context, state) {
                   if (state is NewsPageSuccess) {
-                    // Cambiamos builder por separated para controlar el espacio
                     return ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      // Añadimos un padding inicial para que la primera tarjeta no pegue al borde
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: state.dto.length,
-                      // Definimos el espacio entre tarjetas (aquí 20 pixeles)
                       separatorBuilder: (context, index) =>
                           const SizedBox(width: 20),
                       itemBuilder: (context, index) {
@@ -192,11 +184,12 @@ class _HomePageContent extends StatelessWidget {
               'Ligas',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const LeaguesSearchPageView()),
+                MaterialPageRoute(
+                  builder: (_) => const LeaguesSearchPageView(),
+                ),
               ),
             ),
 
-            // --- SECCIÓN LIGAS ---
             SizedBox(
               height: 160,
               child: BlocBuilder<LeagueBloc, LeagueState>(
@@ -242,7 +235,6 @@ class _HomePageContent extends StatelessWidget {
               ),
             ),
 
-            // --- SECCIÓN EQUIPOS ---
             SizedBox(
               height: 160,
               child: BlocBuilder<TeamBloc, TeamState>(
@@ -259,7 +251,6 @@ class _HomePageContent extends StatelessWidget {
 
                         return GestureDetector(
                           onTap: () {
-                            // Navegación al detalle del equipo
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -288,9 +279,8 @@ class _HomePageContent extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           TextButton(
-                            onPressed: () => context.read<TeamBloc>().add(
-                              LoadTeamsEvent(),
-                            ),
+                            onPressed: () =>
+                                context.read<TeamBloc>().add(LoadTeamsEvent()),
                             child: const Text(
                               'Reintentar',
                               style: TextStyle(color: Color(0xFF8b5cf6)),
@@ -311,15 +301,13 @@ class _HomePageContent extends StatelessWidget {
     );
   }
 
-  // --- WIDGETS AUXILIARES CORREGIDOS ---
-
   Widget _buildHeader(
     BuildContext context,
     dynamic profile,
     String displayName,
   ) {
     final isPremium = (profile?.isPremium ?? 0) == 1;
-    
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -425,10 +413,11 @@ class _HomePageContent extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.location_on_outlined,
-                        color: (isPremium
-                                ? const Color(0xFF1d72fe)
-                                : Colors.deepPurple)
-                            .withOpacity(0.7),
+                        color:
+                            (isPremium
+                                    ? const Color(0xFF1d72fe)
+                                    : Colors.deepPurple)
+                                .withOpacity(0.7),
                         size: 16,
                       ),
                       const SizedBox(width: 6),
@@ -452,10 +441,11 @@ class _HomePageContent extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Icon(
                             Icons.flag,
-                            color: (isPremium
-                                    ? const Color(0xFF1d72fe)
-                                    : Colors.deepPurple)
-                                .withOpacity(0.5),
+                            color:
+                                (isPremium
+                                        ? const Color(0xFF1d72fe)
+                                        : Colors.deepPurple)
+                                    .withOpacity(0.5),
                             size: 16,
                           ),
                         ),
@@ -486,7 +476,6 @@ class _HomePageContent extends StatelessWidget {
     );
   }
 
-  // Ahora acepta un VoidCallback para que el botón "Ver todo" funcione
   Widget _buildSectionTitle(
     BuildContext context,
     String title, {

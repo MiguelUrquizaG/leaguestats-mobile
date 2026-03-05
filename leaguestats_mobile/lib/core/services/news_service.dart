@@ -147,7 +147,6 @@ class NewsService implements NewsInterface {
     } catch (e) {
       throw Exception(e.toString());
     }
-    //Comentarios del usuario en esa noticia. /news/{newsId}/comments
   }
 
   @override

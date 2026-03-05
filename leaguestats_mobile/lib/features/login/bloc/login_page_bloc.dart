@@ -28,7 +28,7 @@ class LoginPageBloc extends Bloc<LoginPageEvent, LoginPageState> {
 
         var login_response = await auth_service.login(event.dto);
 
-        // Validar que el rol sea 'user'
+        
         final userRole = login_response.user?.role?.trim().toLowerCase();
         if (userRole != 'user') {
           emit(

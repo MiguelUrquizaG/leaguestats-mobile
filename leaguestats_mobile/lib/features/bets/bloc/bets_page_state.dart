@@ -23,10 +23,9 @@ final class PreviousBetSuccess extends BetsPageState {
 
 final class WithdrawBetSuccess extends BetsPageState {}
 
-// En bets_page_state.dart
-// En bets_page_state.dart
+
 final class UserBetsHistorySuccess extends BetsPageState {
-  final List<UserBetDto> bets; // <-- Importante: Tipo UserBetDto
+  final List<UserBetDto> bets; 
   UserBetsHistorySuccess({required this.bets});
 }
 

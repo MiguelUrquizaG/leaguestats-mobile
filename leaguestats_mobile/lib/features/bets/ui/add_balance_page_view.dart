@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart'; // Import del bloc
+import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart'; 
 
 class AddBalancePageView extends StatefulWidget {
   const AddBalancePageView({super.key});
@@ -11,17 +11,12 @@ class AddBalancePageView extends StatefulWidget {
 }
 
 class _AddBalancePageViewState extends State<AddBalancePageView> {
-  // Constants based on the reference design
   static const Color kPrimaryColor = Color(0xFF3B82F6);
-  static const Color kSecondaryColor = Color(0xFF8B5CF6); // Action buttons
-  static const Color kBackgroundDark = Color(
-    0xFF0B0C10,
-  ); // Deep gaming dark background
-  static const Color kCardDark = Color(
-    0xFF15161C,
-  ); // Slightly lighter card background
-  static const Color kCardBorder = Color(0xFF2A2C35); // Border color for cards
-  static const Color kInputDark = Color(0xFF1F2129); // Input field background
+  static const Color kSecondaryColor = Color(0xFF8B5CF6);
+  static const Color kBackgroundDark = Color(0xFF0B0C10);
+  static const Color kCardDark = Color(0xFF15161C);
+  static const Color kCardBorder = Color(0xFF2A2C35);
+  static const Color kInputDark = Color(0xFF1F2129);
   static const Color kTextMuted = Color(0xFF9CA3AF);
 
   final List<int> _presetAmounts = [10, 20, 50, 100];
@@ -44,7 +39,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
           });
         } else {
           setState(() {
-            _selectedAmount = null; // Custom amount
+            _selectedAmount = null;
           });
         }
       } else {
@@ -76,20 +71,18 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
     final double amountValue = double.tryParse(_amountController.text) ?? 0.0;
     final String displayAmount = "\$${amountValue.toStringAsFixed(2)}";
 
-    // --- ENVOLVEMOS EL SCAFFOLD EN EL BLOCCONSUMER ---
     return BlocConsumer<UserPageBloc, UserPageState>(
       listener: (context, state) {
         if (state is UserPageSuccess) {
-          // El pago ha ido bien y el perfil se ha recargado
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('¡Pago realizado con éxito!'),
               backgroundColor: Colors.green,
             ),
           );
-          Navigator.pop(context); // Cierra la pantalla y vuelve atrás
+          Navigator.pop(context);
         } else if (state is UserAddBalanceError) {
-          // Fallo al recargar
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${state.message}'),
@@ -99,7 +92,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
         }
       },
       builder: (context, state) {
-        // Variable para controlar la carga y bloquear botones
+        
         final isLoading = state is UserPageLoading;
 
         return Scaffold(
@@ -107,7 +100,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
           body: SafeArea(
             child: Column(
               children: [
-                // Top App Bar Area
+                
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -123,7 +116,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                               ? null
                               : () => Navigator.pop(
                                   context,
-                                ), // Bloquea si está cargando
+                                ), 
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
                             width: 40,
@@ -153,7 +146,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                   ),
                 ),
 
-                // Scrollable Content Area
+                
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -163,7 +156,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                       children: [
                         const SizedBox(height: 16),
 
-                        // Current Balance Section (Dinámico con BLoC)
+                        
                         Column(
                           children: [
                             Text(
@@ -177,7 +170,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                             ),
                             const SizedBox(height: 8),
 
-                            // Mostramos el saldo real
+                            
                             Builder(
                               builder: (context) {
                                 String balanceText = "\$0.00";
@@ -199,7 +192,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Select Amount Section
+                        
                         Text(
                           'Seleccionar Monto',
                           style: GoogleFonts.inter(
@@ -259,7 +252,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                                             ? Colors.white
                                             : const Color(
                                                 0xFFD1D5DB,
-                                              ), // gray-300
+                                              ), 
                                       ),
                                     ),
                                   ),
@@ -270,7 +263,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Custom Amount Input
+                        
                         Container(
                           decoration: BoxDecoration(
                             color: kInputDark,
@@ -300,7 +293,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                                 child: TextField(
                                   controller: _amountController,
                                   enabled:
-                                      !isLoading, // Bloquea el input si está cargando
+                                      !isLoading, 
                                   keyboardType: TextInputType.number,
                                   style: GoogleFonts.inter(
                                     fontSize: 18,
@@ -321,7 +314,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Payment Method Section
+                        
                         Text(
                           'Método de Pago',
                           style: GoogleFonts.inter(
@@ -332,7 +325,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Payment Method Options
+                        
                         _buildPaymentMethodOption(
                           title: "Credit Card",
                           subtitle: "**** 4432",
@@ -410,7 +403,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              'Pay', // Simplification, would ideally use an SVG or logo
+                              'Pay', 
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -430,7 +423,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
 
                         const SizedBox(
                           height: 100,
-                        ), // Padding for the bottom fixed bar
+                        ), 
                       ],
                     ),
                   ),
@@ -439,7 +432,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
             ),
           ),
 
-          // Bottom Fixed Area
+          
           bottomSheet: Container(
             color: kBackgroundDark.withValues(alpha: 0.95),
             padding: const EdgeInsets.only(
@@ -491,7 +484,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                   onPressed: isLoading || amountValue <= 0
                       ? null
                       : () {
-                          // --- DISPARAMOS EVENTO AL BLOC EN LUGAR DE NAVEGAR ---
+                          
                           context.read<UserPageBloc>().add(
                             UserAddBalanceEvent(amount: amountValue),
                           );
@@ -566,7 +559,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
         ),
         child: Row(
           children: [
-            // Custom Radio Button
+            
             Container(
               width: 20,
               height: 20,
@@ -576,7 +569,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                 border: Border.all(
                   color: isSelected
                       ? kSecondaryColor
-                      : const Color(0xFF4B5563), // gray-600
+                      : const Color(0xFF4B5563), 
                   width: isSelected ? 6 : 1,
                 ),
               ),
@@ -595,7 +588,7 @@ class _AddBalancePageViewState extends State<AddBalancePageView> {
                       fontWeight: FontWeight.w600,
                       color: isSelected
                           ? Colors.white
-                          : const Color(0xFFD1D5DB), // gray-300
+                          : const Color(0xFFD1D5DB), 
                     ),
                   ),
                   if (subtitle != null) ...[

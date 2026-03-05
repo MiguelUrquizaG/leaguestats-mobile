@@ -33,7 +33,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
   int selectedAmount = 200;
   final List<int> presetAmounts = [5, 20, 50, 100, 200, 500, 1000];
   
-  // Variables para guardar el estado anterior
+  
   int _lastKnownBetAmount = 0;
   int? _lastKnownWinnerSelected;
 
@@ -114,33 +114,33 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
       builder: (context, state) {
         final isLoading = state is BetsPageLoading;
         
-        // Capturar si hay un error anterior
+        
         String? errorMessage;
         if (state is BetsPageError) {
           errorMessage = state.message;
         }
 
-        // --- LÓGICA DE VALIDACIÓN ---
+        
         int currentBetAmount = 0;
         int? currentWinnerSelected;
 
         if (state is PreviousBetSuccess) {
           currentBetAmount = state.amount;
           currentWinnerSelected = state.winnerSelected;
-          // Guardar en variables de instancia para mantener incluso si hay error
+          
           _lastKnownBetAmount = currentBetAmount;
           _lastKnownWinnerSelected = currentWinnerSelected;
         } else if (state is BetsPageError) {
-          // Si hay un error, usar los valores guardados anteriormente
+          
           currentBetAmount = _lastKnownBetAmount;
           currentWinnerSelected = _lastKnownWinnerSelected;
         }
 
-        // ¿Apostó por ESTE mismo equipo?
+        
         bool hasBetOnThisTeam =
             currentWinnerSelected != null &&
             currentWinnerSelected == widget.teamId;
-        // ¿Apostó por el OTRO equipo?
+        
         bool hasBetOnOtherTeam =
             currentWinnerSelected != null &&
             currentWinnerSelected != widget.teamId;
@@ -150,7 +150,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
         final basePotentialReturn = totalStakeForProjection * widget.odd;
         final premiumPotentialReturn = basePotentialReturn * _premiumMultiplier;
         final premiumExtra = premiumPotentialReturn - basePotentialReturn;
-        // ----------------------------
+        
 
         return Container(
           decoration: BoxDecoration(
@@ -218,7 +218,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
               ),
               const SizedBox(height: 12),
 
-              // --- ZONA DINÁMICA DE AVISOS ---
+              
               if (hasBetOnThisTeam && currentBetAmount > 0)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
@@ -311,7 +311,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                   ),
                 ),
 
-              // --- MOSTRAR ERRORES EN EL MODAL ---
+              
               if (errorMessage != null)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
@@ -544,7 +544,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                   ),
                 ),
 
-              // ------------------------------------------------
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -607,7 +607,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                   SizedBox(
                     height: 48,
                     child: ElevatedButton(
-                      // BLOQUEAMOS EL BOTÓN SI ESTÁ CARGANDO O SI YA APOSTÓ AL OTRO EQUIPO
+                      
                       onPressed: (isLoading || hasBetOnOtherTeam)
                           ? null
                           : () {
@@ -678,7 +678,7 @@ class _BettingBottomSheetWidgetState extends State<BettingBottomSheetWidget> {
                     final amount = presetAmounts[index];
                     final isSelected = amount == selectedAmount;
                     return GestureDetector(
-                      // BLOQUEAMOS LOS CHIPS SI YA APOSTÓ AL OTRO EQUIPO
+                      
                       onTap: (isLoading || hasBetOnOtherTeam)
                           ? null
                           : () => setState(() => selectedAmount = amount),

@@ -28,7 +28,7 @@ class ProfileStatWidget extends StatelessWidget {
           label.toUpperCase(),
           style: GoogleFonts.splineSans(
             fontSize: 10,
-            color: const Color(0xFFA1A1AA), // text-sub
+            color: const Color(0xFFA1A1AA), 
             letterSpacing: 1.2,
             fontWeight: FontWeight.w500,
           ),

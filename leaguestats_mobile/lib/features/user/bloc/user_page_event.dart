@@ -4,7 +4,7 @@ part of 'user_page_bloc.dart';
 sealed class UserPageEvent {}
 
 final class UserProfileByEmailEvent extends UserPageEvent {
-  // Cambiado 'implements' por 'extends'
+  
   final String? email;
   UserProfileByEmailEvent({this.email});
 }

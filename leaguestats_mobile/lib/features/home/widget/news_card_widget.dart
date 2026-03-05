@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:leaguestats_mobile/features/news/ui/news_detail_page.dart';
 import 'package:leaguestats_mobile/features/others/dynamic_network_image.dart';
-// Asegúrate de importar tu nuevo componente dinámico
-// import 'package:leaguestats_mobile/features/home/widget/dynamic_network_image.dart';
+
+
 
 class NewsCardWidget extends StatelessWidget {
   const NewsCardWidget({
@@ -23,20 +23,20 @@ class NewsCardWidget extends StatelessWidget {
     return Container(
       width: 350,
       height: 200,
-      // clipBehavior es fundamental para que la imagen de fondo respete los bordes redondeados
+      
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Colors.black, // Color de fondo base
+        color: Colors.black, 
       ),
       child: Stack(
         children: [
-          // 1. Capa de fondo: Imagen dinámica (soporta SVG y PNG/JPG)
+          
           Positioned.fill(
             child: Opacity(opacity: 0.45, child: DynamicNetworkImage(url: url)),
           ),
 
-          // 2. Capa de contenido: Textos y botones
+          
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: Column(

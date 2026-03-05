@@ -35,7 +35,7 @@ class _BetsPageViewState extends State<BetsPageView> {
     super.dispose();
   }
 
-  // --- LÓGICA DE NAVEGACIÓN CORREGIDA ---
+  
   void _showBettingModal(
     BuildContext context,
     BetResponseDto bet,
@@ -59,7 +59,7 @@ class _BetsPageViewState extends State<BetsPageView> {
               create: (_) =>
                   UserPageBloc(UserService())..add(UserProfileByEmailEvent()),
             ),
-          // AÑADIMOS EL NUEVO BLOC Y DISPARAMOS EL EVENTO
+          
           BlocProvider(
             create: (_) =>
                 BetsPageBloc(BetService())
@@ -147,7 +147,7 @@ class _BetsPageViewState extends State<BetsPageView> {
                                 balance,
                                 isLoading: userState is UserPageLoading,
                                 context:
-                                    context, // Pasamos context para navegación
+                                    context, 
                               );
                             },
                           ),
@@ -226,7 +226,7 @@ class _BetsPageViewState extends State<BetsPageView> {
     );
   }
 
-  // --- BOTONES DE CUOTAS ACTUALIZADOS ---
+  
   Widget _buildBetMatchCard(BuildContext context, BetResponseDto bet) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -299,7 +299,7 @@ class _BetsPageViewState extends State<BetsPageView> {
           const SizedBox(height: 18),
           Row(
             children: [
-              // EQUIPO 1
+              
               _buildOddButton(
                 bet.team1Value?.toString() ?? "1.0",
                 onTap: () => _showBettingModal(
@@ -307,13 +307,13 @@ class _BetsPageViewState extends State<BetsPageView> {
                   bet,
                   bet.team1?.name ?? "",
                   bet.team1Value ?? 1.0,
-                  bet.team1?.id ?? 0, // Pasamos el ID del equipo 1
+                  bet.team1?.id ?? 0, 
                 ),
               ),
               const SizedBox(width: 10),
               _buildOddButton("VS", isCenter: true),
               const SizedBox(width: 10),
-              // EQUIPO 2
+              
               _buildOddButton(
                 bet.team2Value?.toString() ?? "1.0",
                 onTap: () => _showBettingModal(
@@ -321,7 +321,7 @@ class _BetsPageViewState extends State<BetsPageView> {
                   bet,
                   bet.team2?.name ?? "",
                   bet.team2Value ?? 1.0,
-                  bet.team2?.id ?? 0, // Pasamos el ID del equipo 2
+                  bet.team2?.id ?? 0, 
                 ),
               ),
             ],
@@ -331,7 +331,7 @@ class _BetsPageViewState extends State<BetsPageView> {
     );
   }
 
-  // --- WIDGETS AUXILIARES RESTANTES ---
+  
 
   Widget _buildOddButton(
     String text, {
@@ -433,9 +433,9 @@ class _BetsPageViewState extends State<BetsPageView> {
           ],
         ),
         Row(
-          // Envolvemos en un Row para tener dos botones
+          
           children: [
-            // BOTÓN MIS APUESTAS
+            
             GestureDetector(
               onTap: () {
                 final userBloc = context.read<UserPageBloc?>();

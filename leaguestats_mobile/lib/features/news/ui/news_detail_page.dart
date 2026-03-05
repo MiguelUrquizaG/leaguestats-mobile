@@ -37,12 +37,12 @@ class NewsDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Definición de colores constantes
+    
     const Color primaryColor = Color(0xFFAD2BEE);
     const Color backgroundColor = Color(0xFF050505);
     const Color textSecondary = Color(0xFF9CA3AF);
 
-    // Creamos el Bloc y lanzamos la petición nada más entrar
+    
     return BlocProvider(
       create: (context) =>
           NewsPageBloc(NewsService())..add(NewsGetById(id: newsId)),
@@ -66,7 +66,7 @@ class NewsDetailPage extends StatelessWidget {
             }
 
             if (state is NewsPageSingleSuccess) {
-              final news = state.dto; // Tus datos reales vienen aquí
+              final news = state.dto; 
 
               return Stack(
                 children: [
@@ -74,10 +74,10 @@ class NewsDetailPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Hero Section Dinámico
+                        
                         _buildHeroSection(news, backgroundColor, primaryColor),
 
-                        // Contenido del Artículo Dinámico
+                        
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24.0),
                           child: Column(
@@ -86,7 +86,7 @@ class NewsDetailPage extends StatelessWidget {
                               _buildCategoryTags(news, primaryColor),
                               const SizedBox(height: 16),
                               Text(
-                                news.title, // Título real
+                                news.title, 
                                 style: GoogleFonts.splineSans(
                                   color: Colors.white,
                                   fontSize: 28,
@@ -98,7 +98,7 @@ class NewsDetailPage extends StatelessWidget {
                               _buildAuthorInfo(news, primaryColor),
                               const SizedBox(height: 24),
 
-                              // Descripción real del backend
+                              
                               Text(
                                 news.description,
                                 style: GoogleFonts.merriweather(
@@ -126,7 +126,7 @@ class NewsDetailPage extends StatelessWidget {
     );
   }
 
-  // --- Widgets Auxiliares con Datos Reales ---
+  
 
   Widget _buildHeroSection(dynamic news, Color bgColor, Color primary) {
     return Stack(
@@ -135,7 +135,7 @@ class NewsDetailPage extends StatelessWidget {
           height: 400,
           width: double.infinity,
           child: Image.network(
-            news.photo, // Imagen real
+            news.photo, 
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Container(color: Colors.grey[900]),
           ),
@@ -166,7 +166,7 @@ class NewsDetailPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
-            news.type.toUpperCase(), // Tipo real (ej: "NOTICIA", "RESULTADO")
+            news.type.toUpperCase(), 
             style: GoogleFonts.splineSans(
               color: Colors.white,
               fontSize: 10,
@@ -247,7 +247,7 @@ class NewsDetailPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // Botón Comentarios mejorado
+            
             Container(
               decoration: BoxDecoration(
                 boxShadow: [

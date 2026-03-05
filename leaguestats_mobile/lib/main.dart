@@ -60,7 +60,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const NewsSearchPageView(),
     const BetsPageView(),
     const TeamsSearchPageView(),
-    const SizedBox(), // Placeholder para el menú modal
+    const SizedBox(),
   ];
 
   @override
@@ -71,7 +71,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   void _onItemTapped(int index) {
     if (index == 4) {
-      // Mostrar el menú modal en lugar de navegar
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,

@@ -29,11 +29,11 @@ class NewsCommentResponseDto {
     userId = json['user_id'];
     likes = json['likes'];
     likedByMe =
-      (json['liked_by_me'] ??
-          json['is_liked'] ??
-          json['likedByMe'] ??
-          json['has_liked'])
-        as bool?;
+        (json['liked_by_me'] ??
+                json['is_liked'] ??
+                json['likedByMe'] ??
+                json['has_liked'])
+            as bool?;
     comment = json['comment'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -44,7 +44,9 @@ class NewsCommentResponseDto {
   }
 
   static List<NewsCommentResponseDto> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => NewsCommentResponseDto.fromJson(json)).toList();
+    return jsonList
+        .map((json) => NewsCommentResponseDto.fromJson(json))
+        .toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -93,9 +95,10 @@ class News {
     photo = json['photo'];
     type = json['type'];
 
-       List<News> fromJsonList(List<dynamic> jsonList) {
-        return jsonList.map((json) => News.fromJson(json)).toList();
-      }
+    List<News> fromJsonList(List<dynamic> jsonList) {
+      return jsonList.map((json) => News.fromJson(json)).toList();
+    }
+
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -162,7 +165,7 @@ class UserProfile {
     updatedAt = json['updated_at'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
 
-     List<UserProfile> fromJsonList(List<dynamic> jsonList) {
+    List<UserProfile> fromJsonList(List<dynamic> jsonList) {
       return jsonList.map((json) => UserProfile.fromJson(json)).toList();
     }
   }
@@ -215,9 +218,10 @@ class User {
     role = json['role'];
     emailVerifiedAt = json['email_verified_at'];
 
-       List<User> fromJsonList(List<dynamic> jsonList) {
-        return jsonList.map((json) => User.fromJson(json)).toList();
-      }
+    List<User> fromJsonList(List<dynamic> jsonList) {
+      return jsonList.map((json) => User.fromJson(json)).toList();
+    }
+
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }

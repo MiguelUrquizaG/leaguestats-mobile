@@ -13,7 +13,7 @@ class LogoutPageBloc extends Bloc<LogoutPageEvent, LogoutPageState> {
       emit(LogoutPageLoading());
 
       try {
-        // Eliminar todo el almacenamiento (token y email)
+        
         await _storageService.deleteAll();
         emit(LogoutPageSuccess());
       } catch (e) {

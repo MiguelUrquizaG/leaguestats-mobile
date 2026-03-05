@@ -8,7 +8,6 @@ class UserService implements UserInterface {
   final String _apiUrl = "http://10.0.2.2:8000/api";
   final StorageService _storageService = StorageService();
 
-  // Usamos tu mismo extractor de errores
   String _extractErrorMessage(http.Response response) {
     try {
       final decoded = jsonDecode(response.body);
@@ -20,7 +19,6 @@ class UserService implements UserInterface {
     return response.body;
   }
 
-  // Función auxiliar para no repetir las cabeceras con Token
   Future<Map<String, String>> _getHeaders() async {
     final token = await _storageService.getToken();
     return {
@@ -51,7 +49,6 @@ class UserService implements UserInterface {
 
   @override
   Future<UserResponseDto> getUserProfileByEmail(String email) async {
-    // Simplificamos a una sola ruta limpia, como en tu login
     final response = await http.get(
       Uri.parse('$_apiUrl/usersProfile/search/$email'),
       headers: await _getHeaders(),
@@ -59,7 +56,6 @@ class UserService implements UserInterface {
 
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        // Mapeamos directamente como haces en el login
         final userProfile = UserResponseDto.fromJson(jsonDecode(response.body));
         return userProfile;
       } else {
@@ -72,7 +68,6 @@ class UserService implements UserInterface {
 
   @override
   Future<UserResponseDto> getCurrentUserProfile() async {
-    // Esta función simplemente encadena las dos anteriores
     try {
       final email = await getCurrentUserEmail();
       return await getUserProfileByEmail(email);
@@ -85,7 +80,6 @@ class UserService implements UserInterface {
   Future<void> addBalance(double amount) async {
     final token = await _storageService.getToken();
 
-    // Simulamos 1.5 segundos de carga de pasarela de pago
     await Future.delayed(const Duration(milliseconds: 1500));
 
     final response = await http.post(

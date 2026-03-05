@@ -43,7 +43,7 @@ class PremiumSuccessPage extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // Background Glow Effect
+            
             Positioned(
               top: MediaQuery.of(context).size.height * 0.1,
               left: -50,
@@ -54,7 +54,7 @@ class PremiumSuccessPage extends StatelessWidget {
                   color: const Color(0xFF007AFF).withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                // Blur effect will need ImageFilter or simply be an opaque glow
+                
               ),
             ),
 
@@ -66,13 +66,13 @@ class PremiumSuccessPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Spacer for top alignment
+                  
                   const SizedBox(height: 40),
 
-                  // Icon, Title, Subtitle
+                  
                   Column(
                     children: [
-                      // Check Icon
+                      
                       Container(
                         width: 96,
                         height: 96,
@@ -117,14 +117,14 @@ class PremiumSuccessPage extends StatelessWidget {
                           fontSize: 16,
                           color: Color(
                             0xFF94a3b8,
-                          ), // slate-400 equivalent approx
+                          ), 
                           height: 1.5,
                         ),
                       ),
                     ],
                   ),
 
-                  // Plan Summary Card
+                  
                   Column(
                     children: [
                       Container(
@@ -176,18 +176,18 @@ class PremiumSuccessPage extends StatelessWidget {
                           fontSize: 12,
                           color: Color(
                             0xFF64748b,
-                          ), // slate-500 equivalent approx
+                          ), 
                         ),
                       ),
                     ],
                   ),
 
-                  // Bottom Actions
+                  
                   Column(
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          // Navigate back to home or relevant screen
+                          
                           Navigator.of(context).pushReplacementNamed('/home');
                         },
                         style: ElevatedButton.styleFrom(
@@ -236,7 +236,7 @@ class PremiumSuccessPage extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: Color(0xFF94a3b8), // slate-400 equivalent approx
+            color: Color(0xFF94a3b8), 
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),

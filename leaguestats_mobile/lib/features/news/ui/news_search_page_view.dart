@@ -17,7 +17,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   final TextEditingController _searchController = TextEditingController();
   late final NewsPageBloc _newsPageBloc;
 
-  // Estado para la pestaña seleccionada
+  
   String _selectedTab = 'Todos';
 
   @override
@@ -28,7 +28,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   }
 
   void _onSearchChanged() {
-    setState(() {}); // Redibuja para filtrar mientras se escribe
+    setState(() {}); 
   }
 
   @override
@@ -39,12 +39,12 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
     super.dispose();
   }
 
-  // Lógica de filtrado combinada (Búsqueda + Tipo)
+  
   List<NewsResponseDto> _filterNews(List<NewsResponseDto> news) {
     final query = _searchController.text.trim().toLowerCase();
 
     return news.where((item) {
-      // 1. Filtro por Pestaña (Mapeo a base de datos)
+      
       bool matchesTab = true;
       if (_selectedTab != 'Todos') {
         final Map<String, String> typeMapping = {
@@ -55,7 +55,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
         matchesTab = item.type == typeMapping[_selectedTab];
       }
 
-      // 2. Filtro por consulta de búsqueda
+      
       bool matchesQuery = true;
       if (query.isNotEmpty) {
         matchesQuery =
@@ -282,7 +282,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 ),
               ),
             ),
-            // Background decoration text
+            
             Positioned(
               right: -20,
               top: 16,
@@ -296,7 +296,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 ),
               ),
             ),
-            // Content
+            
             Positioned(
               left: 20,
               top: 32,
@@ -330,7 +330,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 ],
               ),
             ),
-            // Shaded Image overlay
+            
             Positioned(
               right: -10,
               bottom: 0,

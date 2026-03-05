@@ -19,7 +19,7 @@ class ProfileInfoItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E24), // card-dark
+        color: const Color(0xFF1E1E24), 
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Colors.white.withOpacity(0.05),
@@ -31,12 +31,12 @@ class ProfileInfoItem extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFA855F7).withOpacity(0.15), // icon-bg-dark
+              color: const Color(0xFFA855F7).withOpacity(0.15), 
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              color: const Color(0xFFA855F7), // primary
+              color: const Color(0xFFA855F7), 
               size: 20,
             ),
           ),
@@ -57,7 +57,7 @@ class ProfileInfoItem extends StatelessWidget {
                   value,
                   style: GoogleFonts.splineSans(
                     fontSize: 12,
-                    color: const Color(0xFFA1A1AA), // text-sub
+                    color: const Color(0xFFA1A1AA), 
                   ),
                 ),
               ],
@@ -65,7 +65,7 @@ class ProfileInfoItem extends StatelessWidget {
           ),
           const Icon(
             Icons.chevron_right,
-            color: Color(0xFF4B5563), // gray-600
+            color: Color(0xFF4B5563), 
             size: 20,
           ),
         ],

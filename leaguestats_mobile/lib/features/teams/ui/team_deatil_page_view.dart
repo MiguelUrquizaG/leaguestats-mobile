@@ -199,11 +199,11 @@ class _TeamDetailPageViewState extends State<TeamDetailPageView> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(35),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Efecto cristal
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), 
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03), // Fondo casi transparente
+            color: Colors.white.withOpacity(0.03), 
             borderRadius: BorderRadius.circular(35),
             border: Border.all(color: Colors.white.withOpacity(0.1)),
           ),

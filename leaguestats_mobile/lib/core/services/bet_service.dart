@@ -97,7 +97,7 @@ class BetService implements BetInterface {
         return {
           'amount': double.parse(data['total_bet'].toString()).toInt(),
           'winner_selected':
-              data['winner_selected'], // Añadimos el equipo elegido
+              data['winner_selected'],
         };
       }
       return {'amount': 0, 'winner_selected': null};
@@ -113,7 +113,7 @@ class BetService implements BetInterface {
     var response = await http.post(
       Uri.parse(
         '$_apiBaseUrl/userBets/withdraw/$betId',
-      ), // El ID va directo en la URL
+      ), 
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -122,7 +122,7 @@ class BetService implements BetInterface {
 
     try {
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return; // Éxito
+        return; 
       } else {
         throw Exception("Error al retirar: ${response.body}");
       }
@@ -130,7 +130,7 @@ class BetService implements BetInterface {
       throw Exception(e.toString());
     }
   }
-  // En bet_service.dart
+
 
   Future<List<UserBetDto>> getUserBetsById(int userId) async {
     final token = await storageService.getToken();
@@ -146,10 +146,9 @@ class BetService implements BetInterface {
     );
 
     if (response.statusCode == 200) {
-      // Decodificamos el JSON (que es una lista)
+      
       final List<dynamic> data = jsonDecode(response.body);
 
-      // Convertimos cada elemento de la lista en un objeto UserBetDto
       return data.map((json) => UserBetDto.fromJson(json)).toList();
     } else {
       throw Exception("Error al obtener apuestas: ${response.statusCode}");

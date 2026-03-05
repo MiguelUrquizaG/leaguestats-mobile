@@ -32,9 +32,9 @@ class _HistoryPageViewState extends State<HistoryPageView>
 
   Color _getClosedBetColor(int? awarded) {
     if (awarded == 1) {
-      return const Color(0xFF10b981); // Verde para apuestas ganadas
+      return const Color(0xFF10b981); 
     } else {
-      return const Color(0xFFef4444); // Rojo para apuestas perdidas
+      return const Color(0xFFef4444); 
     }
   }
 
@@ -76,7 +76,7 @@ class _HistoryPageViewState extends State<HistoryPageView>
         userState is UserPageSuccess && userState.dto.isPremium == 1;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF050505), // background-dark
+      backgroundColor: const Color(0xFF050505), 
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: Container(
@@ -92,7 +92,7 @@ class _HistoryPageViewState extends State<HistoryPageView>
           child: SafeArea(
             child: Column(
               children: [
-                // Header Row
+                
                 SizedBox(
                   height: 56,
                   child: Row(
@@ -118,12 +118,12 @@ class _HistoryPageViewState extends State<HistoryPageView>
                           ),
                         ),
                       ),
-                      const SizedBox(width: 48), // Balance for back button
+                      const SizedBox(width: 48), 
                     ],
                   ),
                 ),
                 
-                // TabBar Custom
+                
                 Expanded(
                   child: TabBar(
                     controller: _tabController,

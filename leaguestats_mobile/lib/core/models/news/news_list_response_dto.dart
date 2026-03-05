@@ -9,7 +9,7 @@ class NewsListResponse {
 
   factory NewsListResponse.fromJson(Map<String, dynamic> json) {
     return NewsListResponse(
-      // Busca la lista en 'results' o en 'data'. Si no hay nada, devuelve lista vacía.
+  
       results: (json['results'] as List<dynamic>? ?? json['data'] as List<dynamic>? ?? [])
           .map((v) => NewsResponseDto.fromJson(v))
           .toList(),

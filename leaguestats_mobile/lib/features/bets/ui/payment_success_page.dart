@@ -7,7 +7,7 @@ class PaymentSuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Convertimos a double para el formato de texto
+    
     final double safeAmount = amount.toDouble();
     final String formattedAmount = '\$${safeAmount.toStringAsFixed(2)}';
 
