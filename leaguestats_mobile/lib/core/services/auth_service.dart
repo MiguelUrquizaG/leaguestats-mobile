@@ -46,10 +46,16 @@ class AuthService implements AuthInterface {
         );
         return loginResponse;
       } else {
-        throw Exception(_extractErrorMessage(response));
+        String rawError = _extractErrorMessage(response);
+        String finalErrorMessage = rawError;
+
+        if (rawError.toLowerCase().contains('invalid credentials')) {
+          finalErrorMessage = 'Correo o contraseña incorrectos.';
+        }
+        throw finalErrorMessage;
       }
     } catch (e) {
-      throw Exception(e.toString());
+      throw e.toString().replaceAll('Exception: ', '').trim();
     }
   }
 
@@ -71,10 +77,30 @@ class AuthService implements AuthInterface {
         );
         return registerResponse;
       } else {
-        throw Exception(_extractErrorMessage(response));
+        String rawError = _extractErrorMessage(response);
+        String finalErrorMessage = rawError;
+
+        String lowerError = rawError.toLowerCase();
+
+        if (lowerError.contains('taken') ||
+            lowerError.contains('already exists') ||
+            lowerError.contains('registrado') ||
+            lowerError.contains('uso')) {
+          finalErrorMessage =
+              'Este correo electrónico ya está en uso. Por favor, utiliza otro.';
+        }
+        else if (lowerError.contains('8 characters') ||
+            lowerError.contains('least 8') ||
+            lowerError.contains('short') ||
+            lowerError.contains('corta')) {
+          finalErrorMessage =
+              'La contraseña es muy corta. Debe tener al menos 8 caracteres.';
+        }
+
+        throw finalErrorMessage;
       }
     } catch (e) {
-      throw Exception(e.toString());
+      throw e.toString().replaceAll('Exception: ', '').trim();
     }
   }
 
