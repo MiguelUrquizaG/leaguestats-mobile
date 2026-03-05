@@ -11,7 +11,6 @@ import 'package:leaguestats_mobile/features/teams/ui/teams_search_page_view.dart
 import 'package:leaguestats_mobile/features/user/bloc/user_page_bloc.dart';
 import 'package:leaguestats_mobile/features/leagues/ui/leagues_search_page_view.dart';
 import 'package:leaguestats_mobile/features/leagues/ui/league_detail_page_view.dart';
-import 'package:leaguestats_mobile/features/bets/ui/bets_page_view.dart';
 import 'package:leaguestats_mobile/features/login/ui/menu_component.dart';
 
 // Servicios
@@ -21,7 +20,6 @@ import 'package:leaguestats_mobile/core/services/news_service.dart';
 import 'package:leaguestats_mobile/core/services/user_service.dart';
 
 // UI
-import 'package:leaguestats_mobile/features/home/widget/match_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/news_card_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/profile_icon_widget.dart';
 import 'package:leaguestats_mobile/features/home/widget/team_card_widget.dart';
@@ -306,24 +304,6 @@ class _HomePageContent extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
-            ),
-
-            _buildSectionTitle(
-              context,
-              'Partidas destacadas',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const BetsPageView()),
-              ),
-            ),
-            const MatchCardWidget(
-              iconoLiga:
-                  'https://liquipedia.net/commons/images/8/8f/LCK_2021_full_lightmode.png',
-              nombreEquipo1: 'T1',
-              nombreEquipo2: 'Gen.G',
-              paisLiga: 'Corea',
-              urlBandera:
-                  'https://sipalkido.com.ar/wp-content/uploads/2025/08/depositphotos_1919144-stock-photo-flag-of-south-korea.jpg',
             ),
           ],
         ),
