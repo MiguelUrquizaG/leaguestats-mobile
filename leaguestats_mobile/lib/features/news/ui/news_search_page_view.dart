@@ -17,7 +17,6 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   final TextEditingController _searchController = TextEditingController();
   late final NewsPageBloc _newsPageBloc;
 
-  
   String _selectedTab = 'Todos';
 
   @override
@@ -28,7 +27,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
   }
 
   void _onSearchChanged() {
-    setState(() {}); 
+    setState(() {});
   }
 
   @override
@@ -39,12 +38,10 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
     super.dispose();
   }
 
-  
   List<NewsResponseDto> _filterNews(List<NewsResponseDto> news) {
     final query = _searchController.text.trim().toLowerCase();
 
     return news.where((item) {
-      
       bool matchesTab = true;
       if (_selectedTab != 'Todos') {
         final Map<String, String> typeMapping = {
@@ -55,7 +52,6 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
         matchesTab = item.type == typeMapping[_selectedTab];
       }
 
-      
       bool matchesQuery = true;
       if (query.isNotEmpty) {
         matchesQuery =
@@ -115,16 +111,17 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                       }
 
                       return RefreshIndicator(
-                         onRefresh:() async {
-                        context.read<NewsPageBloc>().add(NewsGetAllEvent());
-                         },
+                        onRefresh: () async {
+                          context.read<NewsPageBloc>().add(NewsGetAllEvent());
+                        },
                         child: ListView.separated(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 24,
                           ),
                           itemCount: filteredNews.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 24),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 24),
                           itemBuilder: (context, index) {
                             return _buildNewsCard(filteredNews[index]);
                           },
@@ -287,7 +284,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 ),
               ),
             ),
-            
+
             Positioned(
               right: -20,
               top: 16,
@@ -301,7 +298,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 ),
               ),
             ),
-            
+
             Positioned(
               left: 20,
               top: 32,
@@ -335,7 +332,7 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                 ],
               ),
             ),
-            
+
             Positioned(
               right: -10,
               bottom: 0,
