@@ -114,16 +114,21 @@ class _NewsSearchPageViewState extends State<NewsSearchPageView> {
                         );
                       }
 
-                      return ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 24,
+                      return RefreshIndicator(
+                         onRefresh:() async {
+                        context.read<NewsPageBloc>().add(NewsGetAllEvent());
+                         },
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 24,
+                          ),
+                          itemCount: filteredNews.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 24),
+                          itemBuilder: (context, index) {
+                            return _buildNewsCard(filteredNews[index]);
+                          },
                         ),
-                        itemCount: filteredNews.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 24),
-                        itemBuilder: (context, index) {
-                          return _buildNewsCard(filteredNews[index]);
-                        },
                       );
                     }
                     return const SizedBox.shrink();
