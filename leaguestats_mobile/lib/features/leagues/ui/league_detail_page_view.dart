@@ -52,6 +52,7 @@ class _LeagueDetailPageViewState extends State<LeagueDetailPageView> {
 				backgroundColor: const Color(0xFF0F0F11),
 				elevation: 0,
 				centerTitle: false,
+				iconTheme: const IconThemeData(color: Colors.white),
 				title: Text(
 					'Detalle de liga',
 					style: GoogleFonts.inter(

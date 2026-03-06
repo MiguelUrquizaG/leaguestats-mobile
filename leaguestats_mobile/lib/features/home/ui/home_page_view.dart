@@ -492,10 +492,10 @@ class _HomePageContent extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        TextButton(
-          onPressed: onTap,
-          child: const Text('Ver todo', style: TextStyle(color: Colors.grey)),
-        ),
+        // TextButton(
+        //   onPressed: onTap,
+        //   child: const Text('Ver todo', style: TextStyle(color: Colors.grey)),
+        // ),
       ],
     );
   }
